@@ -1,1 +1,614 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Home Call - Owner</title>
+
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0f19;
+    color: white;
+    text-align: center;
+}
+
+header {
+    padding: 25px 15px;
+}
+
+h1 {
+    margin: 0;
+    font-size: 28px;
+}
+
+.status {
+    margin-top: 10px;
+    color: #8b9bb4;
+}
+
+#incoming {
+    display: none;
+    margin: 20px auto;
+    padding: 20px;
+    max-width: 400px;
+    background: #151c2b;
+    border-radius: 18px;
+}
+
+button {
+    border: 0;
+    border-radius: 12px;
+    padding: 14px 22px;
+    margin: 7px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.accept {
+    background: #19c37d;
+    color: white;
+}
+
+.reject,
+.end {
+    background: #e5484d;
+    color: white;
+}
+
+#callArea {
+    display: none;
+    padding: 10px;
+}
+
+.videoBox {
+    position: relative;
+    width: 100%;
+    max-width: 700px;
+    margin: auto;
+}
+
+#remoteVideo {
+    width: 100%;
+    min-height: 250px;
+    background: black;
+    border-radius: 18px;
+    object-fit: cover;
+}
+
+#localVideo {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    width: 140px;
+    height: 190px;
+    background: #111;
+    border: 2px solid white;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+#message {
+    margin: 15px;
+    color: #8b9bb4;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <h1>🏠 Home Call</h1>
+
+    <div class="status" id="status">
+        Menghubungkan ke server...
+    </div>
+
+</header>
+
+
+<!-- ========================= -->
+<!-- PANGGILAN MASUK -->
+<!-- ========================= -->
+
+<div id="incoming">
+
+    <h2>📞 Panggilan Masuk</h2>
+
+    <p>
+        Seseorang sedang menelepon.
+    </p>
+
+    <button
+        class="accept"
+        id="acceptBtn">
+
+        Terima Panggilan
+
+    </button>
+
+    <button
+        class="reject"
+        id="rejectBtn">
+
+        Tolak
+
+    </button>
+
+</div>
+
+
+<div id="message"></div>
+
+
+<!-- ========================= -->
+<!-- AREA VIDEO CALL -->
+<!-- ========================= -->
+
+<div id="callArea">
+
+    <div class="videoBox">
+
+        <!-- Video Penelpon -->
+
+        <video
+            id="remoteVideo"
+            autoplay
+            playsinline>
+        </video>
+
+
+        <!-- Kamera Owner -->
+
+        <video
+            id="localVideo"
+            autoplay
+            muted
+            playsinline>
+        </video>
+
+    </div>
+
+
+    <button
+        class="end"
+        id="endBtn">
+
+        🔴 Akhiri Panggilan
+
+    </button>
+
+</div>
+
+
+<script>
+
+// =====================================
+// ID OWNER
+// =====================================
+
+const OWNER_ID =
+    "homecall-owner-2026";
+
+
+// =====================================
+// VARIABEL
+// =====================================
+
+let peer;
+
+let incomingCall = null;
+
+let localStream = null;
+
+
+// =====================================
+// ELEMENT HTML
+// =====================================
+
+const status =
+    document.getElementById("status");
+
+const incoming =
+    document.getElementById("incoming");
+
+const callArea =
+    document.getElementById("callArea");
+
+const acceptBtn =
+    document.getElementById("acceptBtn");
+
+const rejectBtn =
+    document.getElementById("rejectBtn");
+
+const endBtn =
+    document.getElementById("endBtn");
+
+const remoteVideo =
+    document.getElementById("remoteVideo");
+
+const localVideo =
+    document.getElementById("localVideo");
+
+const message =
+    document.getElementById("message");
+
+
+// =====================================
+// BUAT PEER OWNER
+// =====================================
+
+peer = new Peer(
+    OWNER_ID,
+    {
+        debug: 3,
+
+        config: {
+
+            iceServers: [
+
+                {
+                    urls:
+                        "stun:stun.l.google.com:19302"
+                }
+
+            ]
+
+        }
+
+    }
+);
+
+
+// =====================================
+// OWNER ONLINE
+// =====================================
+
+peer.on(
+    "open",
+    function(id) {
+
+        console.log(
+            "Owner online:",
+            id
+        );
+
+        status.innerText =
+            "🟢 Owner online — menunggu panggilan";
+
+    }
+);
+
+
+// =====================================
+// ADA PANGGILAN MASUK
+// =====================================
+
+peer.on(
+    "call",
+    function(call) {
+
+        console.log(
+            "Panggilan masuk dari:",
+            call.peer
+        );
+
+        incomingCall =
+            call;
+
+        incoming.style.display =
+            "block";
+
+        status.innerText =
+            "📞 Ada panggilan masuk";
+
+    }
+);
+
+
+// =====================================
+// TERIMA PANGGILAN
+// =====================================
+
+acceptBtn.onclick =
+    async function() {
+
+        if (!incomingCall) {
+            return;
+        }
+
+
+        try {
+
+            message.innerText =
+                "Meminta izin kamera dan mikrofon...";
+
+
+            // Kamera + mikrofon OWNER
+
+            localStream =
+                await navigator.mediaDevices
+                .getUserMedia({
+
+                    video: true,
+
+                    audio: true
+
+                });
+
+
+            console.log(
+                "Kamera Owner aktif"
+            );
+
+
+            localVideo.srcObject =
+                localStream;
+
+
+            await localVideo.play()
+                .catch(
+                    function() {}
+                );
+
+
+            // Jawab panggilan
+
+            incomingCall.answer(
+                localStream
+            );
+
+
+            incoming.style.display =
+                "none";
+
+
+            callArea.style.display =
+                "block";
+
+
+            status.innerText =
+                "🟢 Terhubung";
+
+
+            message.innerText =
+                "Menunggu video dari penelpon...";
+
+
+            // =====================================
+            // TERIMA VIDEO PENELPON
+            // =====================================
+
+            incomingCall.on(
+                "stream",
+                function(remoteStream) {
+
+                    console.log(
+                        "Video penelpon diterima"
+                    );
+
+
+                    remoteVideo.srcObject =
+                        remoteStream;
+
+
+                    remoteVideo.play()
+                        .catch(
+                            function(error) {
+
+                                console.log(
+                                    "Video belum autoplay:",
+                                    error
+                                );
+
+                            }
+                        );
+
+
+                    message.innerText =
+                        "🟢 Video terhubung";
+
+                }
+            );
+
+
+            // =====================================
+            // PANGGILAN DITUTUP
+            // =====================================
+
+            incomingCall.on(
+                "close",
+                function() {
+
+                    endCall();
+
+                }
+            );
+
+
+            // =====================================
+            // ERROR PANGGILAN
+            // =====================================
+
+            incomingCall.on(
+                "error",
+                function(error) {
+
+                    console.error(error);
+
+                    message.innerText =
+                        "❌ Koneksi video gagal: " +
+                        error.type;
+
+                }
+            );
+
+
+        } catch(error) {
+
+            console.error(error);
+
+            message.innerText =
+                "❌ Kamera/mikrofon tidak bisa digunakan: " +
+                error.message;
+
+        }
+
+    };
+
+
+// =====================================
+// TOLAK PANGGILAN
+// =====================================
+
+rejectBtn.onclick =
+    function() {
+
+        if (incomingCall) {
+
+            incomingCall.close();
+
+        }
+
+
+        incomingCall =
+            null;
+
+
+        incoming.style.display =
+            "none";
+
+
+        status.innerText =
+            "🟢 Owner online — menunggu panggilan";
+
+    };
+
+
+// =====================================
+// AKHIRI PANGGILAN
+// =====================================
+
+endBtn.onclick =
+    function() {
+
+        if (incomingCall) {
+
+            incomingCall.close();
+
+        }
+
+
+        endCall();
+
+    };
+
+
+// =====================================
+// FUNGSI END CALL
+// =====================================
+
+function endCall() {
+
+    if (localStream) {
+
+        localStream
+            .getTracks()
+            .forEach(
+                function(track) {
+
+                    track.stop();
+
+                }
+            );
+
+
+        localStream =
+            null;
+
+    }
+
+
+    remoteVideo.srcObject =
+        null;
+
+
+    localVideo.srcObject =
+        null;
+
+
+    callArea.style.display =
+        "none";
+
+
+    incoming.style.display =
+        "none";
+
+
+    incomingCall =
+        null;
+
+
+    status.innerText =
+        "🟢 Owner online — menunggu panggilan";
+
+
+    message.innerText =
+        "";
+
+}
+
+
+// =====================================
+// ERROR PEERJS
+// =====================================
+
+peer.on(
+    "error",
+    function(error) {
+
+        console.error(
+            "PeerJS Error:",
+            error
+        );
+
+
+        status.innerText =
+            "❌ PeerJS error: " +
+            error.type;
+
+    }
+);
+
+
+// =====================================
+// DISCONNECT
+// =====================================
+
+peer.on(
+    "disconnected",
+    function() {
+
+        status.innerText =
+            "🟠 Terputus dari server, mencoba kembali...";
+
+
+        peer.reconnect();
+
+    }
+);
+
+</script>
+
+</body>
+  </html>
