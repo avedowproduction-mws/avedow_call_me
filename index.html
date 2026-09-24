@@ -1,1 +1,978 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <title>Home Call</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #080b12;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 500px;
+      min-height: 100vh;
+      margin: auto;
+      padding: 25px 20px;
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    .status {
+      color: #22c55e;
+      font-size: 13px;
+    }
+
+    .welcome {
+      margin-top: 70px;
+    }
+
+    .welcome small {
+      color: #8b93a7;
+      font-size: 15px;
+    }
+
+    .welcome h1 {
+      margin-top: 10px;
+      font-size: 38px;
+      line-height: 1.1;
+    }
+
+    .welcome p {
+      margin-top: 15px;
+      color: #8b93a7;
+      line-height: 1.6;
+    }
+
+    .call-card {
+      margin-top: 45px;
+      padding: 25px;
+      background: #111722;
+      border: 1px solid #202938;
+      border-radius: 25px;
+    }
+
+    .icon {
+      height: 180px;
+      background: #080b12;
+      border-radius: 20px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-size: 65px;
+      margin-bottom: 22px;
+    }
+
+    .call-card h2 {
+      font-size: 21px;
+    }
+
+    .call-card p {
+      color: #7f899d;
+      margin-top: 8px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .call-button {
+      width: 100%;
+      padding: 17px;
+      margin-top: 22px;
+
+      border: none;
+      border-radius: 15px;
+
+      background: #2563eb;
+      color: white;
+
+      font-size: 17px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .call-button:active {
+      transform: scale(0.97);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .feature {
+      padding: 15px 8px;
+      text-align: center;
+
+      background: #111722;
+      border: 1px solid #202938;
+      border-radius: 16px;
+    }
+
+    .feature span {
+      font-size: 23px;
+    }
+
+    .feature p {
+      margin-top: 7px;
+      font-size: 11px;
+      color: #8b93a7;
+    }
+
+    #callArea {
+      display: none;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+    }
+
+    video {
+      width: 100%;
+      background: #000;
+      border-radius: 15px;
+      margin-top: 10px;
+    }
+
+    /*
+      Video lokal bisa dibalik kiri-kanan.
+      Nilainya diubah oleh tombol "Balik Layar".
+    */
+    #localVideo {
+      transform: scaleX(1);
+      transition: transform 0.2s ease;
+    }
+
+    #remoteVideo {
+      min-height: 250px;
+      object-fit: cover;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .control-button {
+      border: none;
+      border-radius: 13px;
+      padding: 14px 8px;
+
+      background: #202938;
+      color: white;
+
+      font-size: 14px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .control-button:active {
+      transform: scale(0.97);
+    }
+
+    .control-button.active {
+      background: #2563eb;
+    }
+
+    .control-button.off {
+      background: #dc2626;
+    }
+
+    .end-button {
+      width: 100%;
+      padding: 16px;
+      margin-top: 15px;
+
+      border: none;
+      border-radius: 15px;
+
+      background: #dc2626;
+      color: white;
+
+      font-size: 16px;
+      font-weight: bold;
+
+      cursor: pointer;
+    }
+
+    .footer {
+      margin-top: 35px;
+      text-align: center;
+      color: #596275;
+      font-size: 12px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <div class="top">
+
+    <div class="logo">
+      Home Call
+    </div>
+
+    <div class="status" id="status">
+      🟢 Online
+    </div>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- HALAMAN DEPAN -->
+  <!-- ========================= -->
+
+  <div id="home">
+
+    <section class="welcome">
+
+      <small>
+        Selamat datang 👋
+      </small>
+
+      <h1>
+        Hubungi<br>
+        saya sekarang.
+      </h1>
+
+      <p>
+        Tekan tombol di bawah untuk
+        memulai panggilan video.
+      </p>
+
+    </section>
+
+
+    <section class="call-card">
+
+      <div class="icon">
+        📹
+      </div>
+
+      <h2>
+        Video Call
+      </h2>
+
+      <p>
+        Hubungkan kamera dan mikrofon
+        untuk melakukan panggilan video.
+      </p>
+
+      <button
+        class="call-button"
+        onclick="startCall()">
+
+        📞 Mulai Video Call
+
+      </button>
+
+    </section>
+
+
+    <section class="features">
+
+      <div class="feature">
+        <span>🎥</span>
+        <p>Video</p>
+      </div>
+
+      <div class="feature">
+        <span>🎙️</span>
+        <p>Audio</p>
+      </div>
+
+      <div class="feature">
+        <span>🔒</span>
+        <p>Aman</p>
+      </div>
+
+    </section>
+
+  </div>
+
+
+  <!-- ========================= -->
+  <!-- AREA VIDEO CALL -->
+  <!-- ========================= -->
+
+  <div class="call-card" id="callArea">
+
+    <h2>
+      🎥 Video Call
+    </h2>
+
+
+    <div class="video-container">
+
+      <!-- Video Owner -->
+      <video
+        id="remoteVideo"
+        autoplay
+        playsinline>
+      </video>
+
+      <!-- Kamera Penelpon -->
+      <video
+        id="localVideo"
+        autoplay
+        muted
+        playsinline>
+      </video>
+
+    </div>
+
+
+    <!-- ========================= -->
+    <!-- KONTROL PANGGILAN -->
+    <!-- ========================= -->
+
+    <div class="controls">
+
+      <button
+        class="control-button"
+        id="cameraButton"
+        onclick="switchCamera()">
+
+        🔄 Balik Kamera
+
+      </button>
+
+
+      <button
+        class="control-button"
+        id="mirrorButton"
+        onclick="toggleMirror()">
+
+        ↔️ Balik Layar
+
+      </button>
+
+
+      <button
+        class="control-button"
+        id="micButton"
+        onclick="toggleMicrophone()">
+
+        🎙️ Mute Mikrofon
+
+      </button>
+
+
+      <button
+        class="control-button"
+        id="videoButton"
+        onclick="toggleVideo()">
+
+        📹 Matikan Layar
+
+      </button>
+
+    </div>
+
+
+    <button
+      class="end-button"
+      onclick="endCall()">
+
+      🔴 Akhiri Panggilan
+
+    </button>
+
+  </div>
+
+
+  <div class="footer">
+    Home Call • Video Communication
+  </div>
+
+</div>
+
+
+<script>
+
+  // =====================================
+  // VARIABEL
+  // =====================================
+
+  let peer;
+  let currentCall = null;
+  let localStream = null;
+
+  let currentFacingMode = "user";
+  let isMirrored = false;
+  let isMuted = false;
+  let isVideoOff = false;
+
+
+  // =====================================
+  // BUAT PEER
+  // =====================================
+
+  peer = new Peer({
+
+    debug: 3,
+
+    config: {
+
+      iceServers: [
+
+        {
+          urls: "stun:stun.l.google.com:19302"
+        }
+
+      ]
+
+    }
+
+  });
+
+
+  // =====================================
+  // PEER ONLINE
+  // =====================================
+
+  peer.on("open", function(id) {
+
+    document.getElementById("status").textContent =
+      "🟢 Online";
+
+  });
+
+
+  // =====================================
+  // ERROR PEER
+  // =====================================
+
+  peer.on("error", function(error) {
+
+    console.log(error);
+
+    document.getElementById("status").textContent =
+      "🔴 Koneksi bermasalah";
+
+    alert(
+      "Koneksi gagal: " + error.type
+    );
+
+  });
+
+
+  // =====================================
+  // MULAI PANGGILAN
+  // =====================================
+
+  async function startCall() {
+
+    try {
+
+      localStream =
+        await navigator.mediaDevices.getUserMedia({
+
+          video: true,
+
+          audio: true
+
+        });
+
+
+      const localVideo =
+        document.getElementById("localVideo");
+
+
+      localVideo.srcObject =
+        localStream;
+
+
+      await localVideo.play().catch(
+        function() {}
+      );
+
+
+      // =====================================
+      // HUBUNGI OWNER
+      // =====================================
+
+      currentCall =
+        peer.call(
+          "homecall-owner-2026",
+          localStream
+        );
+
+
+      document.getElementById("home").style.display =
+        "none";
+
+
+      document.getElementById("callArea").style.display =
+        "block";
+
+
+      document.getElementById("status").textContent =
+        "📞 Memanggil...";
+
+
+      // =====================================
+      // TERIMA VIDEO OWNER
+      // =====================================
+
+      currentCall.on(
+        "stream",
+        function(remoteStream) {
+
+          const remoteVideo =
+            document.getElementById("remoteVideo");
+
+          remoteVideo.srcObject =
+            remoteStream;
+
+          remoteVideo.play().catch(
+            function() {}
+          );
+
+          document.getElementById("status").textContent =
+            "🟢 Terhubung";
+
+        }
+      );
+
+
+      // =====================================
+      // PANGGILAN DITUTUP
+      // =====================================
+
+      currentCall.on(
+        "close",
+        function() {
+
+          endCall();
+
+        }
+      );
+
+
+      // =====================================
+      // ERROR PANGGILAN
+      // =====================================
+
+      currentCall.on(
+        "error",
+        function(error) {
+
+          console.log(error);
+
+          alert("Panggilan gagal.");
+
+          endCall();
+
+        }
+      );
+
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
+        error.message
+      );
+
+    }
+
+  }
+
+
+  // =====================================
+  // 🔄 BALIK KAMERA
+  // DEPAN ↔ BELAKANG
+  // =====================================
+
+  async function switchCamera() {
+
+    if (!localStream || !currentCall) {
+      return;
+    }
+
+
+    try {
+
+      const newFacingMode =
+        currentFacingMode === "user"
+          ? "environment"
+          : "user";
+
+
+      const newStream =
+        await navigator.mediaDevices.getUserMedia({
+
+          video: {
+            facingMode: {
+              exact: newFacingMode
+            }
+          },
+
+          audio: false
+
+        });
+
+
+      const newVideoTrack =
+        newStream.getVideoTracks()[0];
+
+
+      const sender =
+        currentCall.peerConnection
+          .getSenders()
+          .find(function(s) {
+
+            return s.track &&
+                   s.track.kind === "video";
+
+          });
+
+
+      if (sender) {
+
+        await sender.replaceTrack(
+          newVideoTrack
+        );
+
+      }
+
+
+      const oldVideoTrack =
+        localStream.getVideoTracks()[0];
+
+
+      if (oldVideoTrack) {
+
+        oldVideoTrack.stop();
+
+      }
+
+
+      localStream.removeTrack(
+        oldVideoTrack
+      );
+
+
+      localStream.addTrack(
+        newVideoTrack
+      );
+
+
+      document.getElementById("localVideo").srcObject =
+        localStream;
+
+
+      currentFacingMode =
+        newFacingMode;
+
+
+      // Kamera belakang biasanya tidak perlu mirror
+      if (currentFacingMode === "environment") {
+
+        isMirrored = false;
+
+        document.getElementById("localVideo").style.transform =
+          "scaleX(1)";
+
+      }
+
+
+      document.getElementById("mirrorButton").textContent =
+        isMirrored
+          ? "↔️ Normal"
+          : "↔️ Balik Layar";
+
+
+    } catch (error) {
+
+      console.log(error);
+
+      alert(
+        "Tidak bisa mengganti kamera.\n\n" +
+        error.message
+      );
+
+    }
+
+  }
+
+
+  // =====================================
+  // ↔️ BALIK LAYAR
+  // KIRI ↔ KANAN
+  // =====================================
+
+  function toggleMirror() {
+
+    const localVideo =
+      document.getElementById("localVideo");
+
+
+    isMirrored =
+      !isMirrored;
+
+
+    if (isMirrored) {
+
+      localVideo.style.transform =
+        "scaleX(-1)";
+
+      document.getElementById("mirrorButton").textContent =
+        "↔️ Normal";
+
+    } else {
+
+      localVideo.style.transform =
+        "scaleX(1)";
+
+      document.getElementById("mirrorButton").textContent =
+        "↔️ Balik Layar";
+
+    }
+
+  }
+
+
+  // =====================================
+  // 🎙️ MUTE / UNMUTE MIKROFON
+  // =====================================
+
+  function toggleMicrophone() {
+
+    if (!localStream) {
+      return;
+    }
+
+
+    const audioTracks =
+      localStream.getAudioTracks();
+
+
+    if (audioTracks.length === 0) {
+      return;
+    }
+
+
+    isMuted =
+      !isMuted;
+
+
+    audioTracks.forEach(
+      function(track) {
+
+        track.enabled =
+          !isMuted;
+
+      }
+    );
+
+
+    const button =
+      document.getElementById("micButton");
+
+
+    if (isMuted) {
+
+      button.textContent =
+        "🔇 Unmute Mikrofon";
+
+      button.classList.add("off");
+
+    } else {
+
+      button.textContent =
+        "🎙️ Mute Mikrofon";
+
+      button.classList.remove("off");
+
+    }
+
+  }
+
+
+  // =====================================
+  // 📹 MATIKAN / NYALAKAN VIDEO
+  // =====================================
+
+  function toggleVideo() {
+
+    if (!localStream) {
+      return;
+    }
+
+
+    const videoTracks =
+      localStream.getVideoTracks();
+
+
+    if (videoTracks.length === 0) {
+      return;
+    }
+
+
+    isVideoOff =
+      !isVideoOff;
+
+
+    videoTracks.forEach(
+      function(track) {
+
+        track.enabled =
+          !isVideoOff;
+
+      }
+    );
+
+
+    const button =
+      document.getElementById("videoButton");
+
+
+    if (isVideoOff) {
+
+      button.textContent =
+        "📹 Nyalakan Layar";
+
+      button.classList.add("off");
+
+    } else {
+
+      button.textContent =
+        "📹 Matikan Layar";
+
+      button.classList.remove("off");
+
+    }
+
+  }
+
+
+  // =====================================
+  // 🔴 AKHIRI PANGGILAN
+  // =====================================
+
+  function endCall() {
+
+    if (currentCall) {
+
+      try {
+
+        currentCall.close();
+
+      } catch (error) {
+
+        console.log(error);
+
+      }
+
+      currentCall = null;
+
+    }
+
+
+    if (localStream) {
+
+      localStream
+        .getTracks()
+        .forEach(function(track) {
+
+          track.stop();
+
+        });
+
+      localStream = null;
+
+    }
+
+
+    document.getElementById("localVideo").srcObject =
+      null;
+
+    document.getElementById("remoteVideo").srcObject =
+      null;
+
+
+    document.getElementById("callArea").style.display =
+      "none";
+
+
+    document.getElementById("home").style.display =
+      "block";
+
+
+    document.getElementById("status").textContent =
+      "🟢 Online";
+
+
+    // Reset tombol
+
+    isMirrored = false;
+    isMuted = false;
+    isVideoOff = false;
+    currentFacingMode = "user";
+
+
+    document.getElementById("localVideo").style.transform =
+      "scaleX(1)";
+
+
+    document.getElementById("mirrorButton").textContent =
+      "↔️ Balik Layar";
+
+
+    document.getElementById("micButton").textContent =
+      "🎙️ Mute Mikrofon";
+
+
+    document.getElementById("micButton").classList.remove("off");
+
+
+    document.getElementById("videoButton").textContent =
+      "📹 Matikan Layar";
+
+
+    document.getElementById("videoButton").classList.remove("off");
+
+  }
+
+</script>
+
+</body>
+  </html>
