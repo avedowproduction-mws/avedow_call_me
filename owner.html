@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Home Call</title>
+<title>Home Call - Avedo</title>
 
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
@@ -43,46 +43,17 @@ body{
   padding:20px;
 }
 
-.welcome{
+.waiting{
   text-align:center;
-  margin:25px 0;
+  padding:45px 20px;
 }
 
-.welcome h2{
-  margin-bottom:8px;
-}
-
-.welcome p{
-  color:#aeb7c2;
-}
-
-.card{
-  background:#151c25;
-  border-radius:20px;
-  padding:25px;
-  text-align:center;
-  box-shadow:0 8px 30px #0005;
-}
-
-.callIcon{
-  font-size:55px;
-}
-
-.start{
-  width:100%;
-  margin-top:15px;
-  background:#18a957;
-  color:white;
-  border:0;
-  border-radius:13px;
-  padding:14px;
-  font-size:17px;
-  font-weight:bold;
+.waitingIcon{
+  font-size:60px;
 }
 
 #callArea{
   display:none;
-  margin-top:20px;
 }
 
 .videoBox{
@@ -218,6 +189,42 @@ body{
   font-size:20px;
   margin:2px;
 }
+
+.incoming{
+  display:none;
+  background:#151c25;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+  margin-bottom:20px;
+}
+
+.incoming h2{
+  margin-top:5px;
+}
+
+.incomingButtons{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+}
+
+.incomingButtons button{
+  flex:1;
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  color:white;
+  font-size:15px;
+}
+
+.accept{
+  background:#18a957;
+}
+
+.reject{
+  background:#d83232;
+}
 </style>
 </head>
 
@@ -230,19 +237,36 @@ body{
 
 <div class="container">
 
-  <div class="welcome">
-    <h2>Selamat datang 👋</h2>
-    <p>Hubungi pemilik rumah sekarang.</p>
+  <div class="incoming" id="incoming">
+
+    <div style="font-size:45px">📞</div>
+
+    <h2>Panggilan Masuk</h2>
+
+    <p>Seseorang ingin menghubungi Avedo.</p>
+
+    <div class="incomingButtons">
+
+      <button class="accept" onclick="acceptCall()">
+        ✅ Terima
+      </button>
+
+      <button class="reject" onclick="rejectCall()">
+        ❌ Tolak
+      </button>
+
+    </div>
+
   </div>
 
-  <div class="card" id="startCard">
-    <div class="callIcon">📹</div>
-    <h2>Video Call</h2>
-    <p>Tekan tombol di bawah untuk menghubungi Avedo.</p>
+  <div class="waiting" id="waiting">
 
-    <button class="start" onclick="startCall()">
-      📞 Mulai Video Call
-    </button>
+    <div class="waitingIcon">📹</div>
+
+    <h2>Menunggu Panggilan</h2>
+
+    <p>Avedo siap menerima panggilan.</p>
+
   </div>
 
   <div id="callArea">
@@ -280,6 +304,7 @@ body{
       <div class="messages" id="messages"></div>
 
       <div class="emojiPanel" id="emojiPanel">
+
         <span onclick="addEmoji('😀')">😀</span>
         <span onclick="addEmoji('😂')">😂</span>
         <span onclick="addEmoji('😊')">😊</span>
@@ -292,6 +317,7 @@ body{
         <span onclick="addEmoji('🎉')">🎉</span>
         <span onclick="addEmoji('👋')">👋</span>
         <span onclick="addEmoji('🏠')">🏠</span>
+
       </div>
 
       <div class="chatRow">
@@ -322,8 +348,9 @@ body{
 
 const OWNER_ID="homecall-owner-2026";
 
-const peer=new Peer();
+const peer=new Peer(OWNER_ID);
 
+let incomingCall=null;
 let currentCall=null;
 let dataConnection=null;
 
@@ -337,13 +364,22 @@ const localVideo=document.getElementById("localVideo");
 const remoteVideo=document.getElementById("remoteVideo");
 const statusEl=document.getElementById("status");
 
-peer.on("open",()=>{
-  statusEl.textContent="🟢 Online";
-});
+peer.on("open",async()=>{
 
-peer.on("error",err=>{
-  console.log(err);
-  statusEl.textContent="🔴 Terjadi masalah";
+  statusEl.textContent="🟢 Online";
+
+  try{
+
+    await getMedia();
+
+  }catch(e){
+
+    console.log(e);
+
+    statusEl.textContent="🔴 Kamera tidak tersedia";
+
+  }
+
 });
 
 async function getMedia(){
@@ -358,37 +394,62 @@ async function getMedia(){
   localVideo.srcObject=localStream;
 }
 
-async function startCall(){
+peer.on("call",call=>{
 
-  try{
+  incomingCall=call;
 
-    await getMedia();
+  document.getElementById("incoming").style.display="block";
+  document.getElementById("waiting").style.display="none";
 
-    document.getElementById("startCard").style.display="none";
-    document.getElementById("callArea").style.display="block";
+});
 
-    dataConnection=peer.connect(OWNER_ID);
+function acceptCall(){
 
-    dataConnection.on("data",handleData);
+  if(!incomingCall)return;
 
-    currentCall=peer.call(OWNER_ID,localStream);
+  currentCall=incomingCall;
+  incomingCall=null;
 
-    currentCall.on("stream",stream=>{
-      remoteVideo.srcObject=stream;
-    });
+  document.getElementById("incoming").style.display="none";
+  document.getElementById("callArea").style.display="block";
 
-    currentCall.on("close",()=>{
-      endCall(false);
-    });
+  currentCall.answer(localStream);
 
-  }catch(e){
+  currentCall.on("stream",stream=>{
 
-    console.log(e);
+    remoteVideo.srcObject=stream;
 
-    alert("Kamera tidak dapat digunakan.");
+  });
+
+  currentCall.on("close",()=>{
+
+    endCall(false);
+
+  });
+
+}
+
+function rejectCall(){
+
+  if(incomingCall){
+
+    incomingCall.close();
+    incomingCall=null;
 
   }
+
+  document.getElementById("incoming").style.display="none";
+  document.getElementById("waiting").style.display="block";
+
 }
+
+peer.on("connection",connection=>{
+
+  dataConnection=connection;
+
+  connection.on("data",handleData);
+
+});
 
 function toggleMirror(){
 
@@ -454,12 +515,13 @@ function endCall(sendMessage=true){
   localVideo.srcObject=null;
 
   document.getElementById("callArea").style.display="none";
-  document.getElementById("startCard").style.display="block";
+  document.getElementById("waiting").style.display="block";
 
   cameraOn=true;
   mirrored=false;
 
   document.getElementById("camBtn").textContent="📹 Kamera";
+
 }
 
 function toggleEmoji(){
@@ -470,6 +532,7 @@ function toggleEmoji(){
     panel.style.display==="block"
     ? "none"
     : "block";
+
 }
 
 function addEmoji(emoji){
@@ -484,6 +547,7 @@ function addEmoji(emoji){
 function sendMessage(){
 
   const input=document.getElementById("messageInput");
+
   const text=input.value.trim();
 
   if(!text)return;
@@ -495,10 +559,12 @@ function sendMessage(){
       message:text
     });
 
-    addMessage("Penelepon",text,true);
+    addMessage("Avedo",text,true);
 
     input.value="";
+
   }
+
 }
 
 function addMessage(name,text,mine){
@@ -518,21 +584,24 @@ function addMessage(name,text,mine){
   box.appendChild(div);
 
   box.scrollTop=box.scrollHeight;
+
 }
 
 function escapeHtml(text){
 
   const div=document.createElement("div");
+
   div.textContent=text;
 
   return div.innerHTML;
+
 }
 
 function handleData(data){
 
   if(data.type==="chat"){
 
-    addMessage("Avedo",data.message,false);
+    addMessage("Penelepon",data.message,false);
 
   }
 
