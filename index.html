@@ -3,761 +3,853 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>HOMEKALL</title>
 
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
 <style>
-* {
-  box-sizing: border-box;
+*{
+    box-sizing:border-box;
 }
 
-body {
-  margin: 0;
-  background: #080b12;
-  color: white;
-  font-family: Arial, sans-serif;
+body{
+    margin:0;
+    background:#080b12;
+    color:white;
+    font-family:Arial,sans-serif;
 }
 
-header {
-  padding: 16px;
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  background: #111827;
+header{
+    padding:16px;
+    text-align:center;
+    font-size:23px;
+    font-weight:bold;
+    background:#111827;
 }
 
-.status {
-  text-align: center;
-  padding: 10px;
-  color: #aaa;
+.status{
+    text-align:center;
+    padding:8px;
+    color:#aaa;
 }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 12px;
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:12px;
 }
 
-.videos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+.callArea{
+    position:relative;
+    width:100%;
+    height:65vh;
+    min-height:400px;
+    background:#000;
+    border-radius:18px;
+    overflow:hidden;
 }
 
-.videoBox {
-  position: relative;
-  background: #111827;
-  border-radius: 16px;
-  overflow: hidden;
-  min-height: 230px;
+#remoteVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    background:#000;
 }
 
-video {
-  width: 100%;
-  height: 100%;
-  min-height: 230px;
-  object-fit: cover;
-  background: black;
-  display: block;
+.localBox{
+    position:absolute;
+    right:15px;
+    bottom:15px;
+    width:145px;
+    height:190px;
+    border-radius:14px;
+    overflow:hidden;
+    background:#111;
+    border:2px solid white;
+    box-shadow:0 5px 20px #000;
 }
 
-.label {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: #000b;
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 12px;
+#localVideo{
+    width:100%;
+    height:100%;
+    object-fit:cover;
 }
 
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 9px;
-  margin-top: 12px;
+.label{
+    position:absolute;
+    left:8px;
+    top:8px;
+    background:#000b;
+    padding:5px 8px;
+    border-radius:20px;
+    font-size:11px;
 }
 
-button {
-  border: none;
-  border-radius: 12px;
-  padding: 13px;
-  font-size: 15px;
-  font-weight: bold;
-  background: #263244;
-  color: white;
+.welcome{
+    text-align:center;
+    padding:15px;
 }
 
-button.active {
-  background: #2563eb;
+.welcome h2{
+    margin:5px 0;
 }
 
-button.danger {
-  background: #b91c1c;
+.startBtn{
+    width:100%;
+    padding:15px;
+    border:0;
+    border-radius:14px;
+    background:#16a34a;
+    color:white;
+    font-size:17px;
+    font-weight:bold;
 }
 
-.chat {
-  margin-top: 12px;
-  background: #111827;
-  padding: 12px;
-  border-radius: 16px;
+.controls{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+    margin-top:12px;
 }
 
-.messages {
-  height: 150px;
-  overflow-y: auto;
-  background: #080b12;
-  padding: 10px;
-  border-radius: 12px;
-  margin-bottom: 9px;
+button{
+    border:0;
+    border-radius:12px;
+    padding:13px 8px;
+    background:#263244;
+    color:white;
+    font-size:14px;
+    font-weight:bold;
 }
 
-.message {
-  padding: 8px 10px;
-  background: #1f2937;
-  border-radius: 10px;
-  margin: 6px 0;
-  word-break: break-word;
+button.active{
+    background:#2563eb;
 }
 
-.message.me {
-  background: #1d4ed8;
+button.danger{
+    background:#b91c1c;
 }
 
-.chatRow {
-  display: flex;
-  gap: 8px;
+.chat{
+    margin-top:12px;
+    background:#111827;
+    padding:12px;
+    border-radius:16px;
 }
 
-input {
-  flex: 1;
-  min-width: 0;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  font-size: 15px;
+.messages{
+    height:140px;
+    overflow-y:auto;
+    background:#080b12;
+    padding:10px;
+    border-radius:12px;
+    margin-bottom:9px;
 }
 
-.start {
-  display: block;
-  margin: 10px auto;
-  background: #16a34a;
+.message{
+    padding:8px 10px;
+    background:#1f2937;
+    border-radius:10px;
+    margin:6px 0;
+    word-break:break-word;
 }
 
-@media (max-width: 600px) {
-  .videos {
-    grid-template-columns: 1fr;
-  }
+.message.me{
+    background:#1d4ed8;
+}
 
-  .videoBox,
-  video {
-    min-height: 210px;
-  }
+.chatRow{
+    display:flex;
+    gap:8px;
+}
+
+input{
+    flex:1;
+    min-width:0;
+    padding:12px;
+    border:0;
+    border-radius:10px;
+    font-size:15px;
+}
+
+@media(max-width:600px){
+
+    .callArea{
+        height:60vh;
+        min-height:350px;
+    }
+
+    .localBox{
+        width:105px;
+        height:140px;
+        right:10px;
+        bottom:10px;
+    }
+
 }
 </style>
 </head>
 
 <body>
 
-<header>🏠 HOMEKALL</header>
+<header>
+🏠 HOMEKALL
+</header>
 
 <div id="status" class="status">
-  🟡 Memulai...
+🟡 Menghubungkan...
 </div>
 
 <div class="container">
 
-  <div class="videos">
+<div class="welcome">
+<h2>Selamat datang 👋</h2>
+<p>Hubungi pemilik rumah sekarang.</p>
 
-    <div class="videoBox">
-      <video id="localVideo" autoplay muted playsinline></video>
-      <div class="label">Penelpon</div>
-    </div>
+<button id="startBtn" class="startBtn">
+📞 Mulai Video Call
+</button>
+</div>
 
-    <div class="videoBox">
-      <video id="remoteVideo" autoplay playsinline></video>
-      <div class="label">Pemilik</div>
-    </div>
+<div class="callArea">
 
-  </div>
+<video id="remoteVideo"
+       autoplay
+       playsinline>
+</video>
 
-  <div class="controls">
+<div class="localBox">
 
-    <button id="mirrorBtn">
-      ↔️ Balik Layar
-    </button>
+<video id="localVideo"
+       autoplay
+       muted
+       playsinline>
+</video>
 
-    <button id="micBtn">
-      🎙️ Matikan Mikrofon
-    </button>
+<div class="label">
+Penelpon
+</div>
 
-    <button id="camBtn">
-      📹 Matikan Kamera
-    </button>
+</div>
 
-    <button id="endBtn" class="danger">
-      🔴 Akhiri Panggilan
-    </button>
+</div>
 
-  </div>
+<div class="controls">
 
-  <div class="chat">
+<button id="mirrorBtn">
+↔️ Balik Layar
+</button>
 
-    <div id="messages" class="messages"></div>
+<button id="micBtn">
+🎙️ Matikan Mikrofon
+</button>
 
-    <div class="chatRow">
+<button id="camBtn">
+📹 Matikan Kamera
+</button>
 
-      <input
-        id="messageInput"
-        maxlength="500"
-        placeholder="Ketik pesan..."
-      >
+<button id="endBtn" class="danger">
+🔴 Akhiri Panggilan
+</button>
 
-      <button id="sendBtn">
-        💬 Kirim
-      </button>
+</div>
 
-    </div>
+<div class="chat">
 
-  </div>
+<div id="messages" class="messages"></div>
+
+<div class="chatRow">
+
+<input
+id="messageInput"
+placeholder="Ketik pesan..."
+maxlength="500">
+
+<button id="sendBtn">
+💬 Kirim
+</button>
+
+</div>
+
+</div>
 
 </div>
 
 <script>
 
-const OWNER_ID = "homecall-owner-2026";
+const OWNER_ID="homecall-owner-2026";
 
-const peer = new Peer(undefined, {
-  host: "0.peerjs.com",
-  port: 443,
-  secure: true,
-  path: "/"
+const peer=new Peer(undefined,{
+    host:"0.peerjs.com",
+    port:443,
+    secure:true,
+    path:"/"
 });
 
-let localStream = null;
-let currentCall = null;
-let dataConnection = null;
+let localStream=null;
+let currentCall=null;
+let dataConnection=null;
 
-let mirrorState = false;
-let microphoneOn = true;
-let cameraOn = true;
+let mirror=false;
+let mic=true;
+let cam=true;
 
-const localVideo = document.getElementById("localVideo");
-const remoteVideo = document.getElementById("remoteVideo");
+let audioTrack=null;
+let videoTrack=null;
 
-const statusText = document.getElementById("status");
+const localVideo=
+document.getElementById("localVideo");
 
-const mirrorBtn = document.getElementById("mirrorBtn");
-const micBtn = document.getElementById("micBtn");
-const camBtn = document.getElementById("camBtn");
-const endBtn = document.getElementById("endBtn");
+const remoteVideo=
+document.getElementById("remoteVideo");
 
-const messageInput = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
-const messages = document.getElementById("messages");
+const status=
+document.getElementById("status");
+
+const mirrorBtn=
+document.getElementById("mirrorBtn");
+
+const micBtn=
+document.getElementById("micBtn");
+
+const camBtn=
+document.getElementById("camBtn");
+
+const endBtn=
+document.getElementById("endBtn");
+
+const startBtn=
+document.getElementById("startBtn");
+
+const input=
+document.getElementById("messageInput");
+
+const sendBtn=
+document.getElementById("sendBtn");
+
+const messages=
+document.getElementById("messages");
 
 
-function setStatus(text) {
-  statusText.textContent = text;
+function setStatus(text){
+    status.textContent=text;
 }
 
 
-function addMessage(text, mine) {
+function addMessage(text,mine){
 
-  const div = document.createElement("div");
+    const div=document.createElement("div");
 
-  div.className = "message";
+    div.className="message";
 
-  if (mine) {
-    div.classList.add("me");
-  }
+    if(mine){
+        div.classList.add("me");
+    }
 
-  div.textContent =
-    (mine ? "Saya: " : "Pemilik: ") + text;
+    div.textContent=
+        (mine?"Saya: ":"Pemilik: ")+text;
 
-  messages.appendChild(div);
+    messages.appendChild(div);
 
-  messages.scrollTop = messages.scrollHeight;
+    messages.scrollTop=
+        messages.scrollHeight;
 }
 
 
-function sendData(data) {
+function sendData(data){
 
-  if (
-    dataConnection &&
-    dataConnection.open
-  ) {
-    dataConnection.send(data);
-  }
+    if(dataConnection &&
+       dataConnection.open){
 
-}
+        dataConnection.send(data);
 
-
-function updateButtons() {
-
-  mirrorBtn.textContent =
-    mirrorState
-      ? "↔️ Balik Layar: ON"
-      : "↔️ Balik Layar";
-
-  micBtn.textContent =
-    microphoneOn
-      ? "🎙️ Matikan Mikrofon"
-      : "🎙️ Nyalakan Mikrofon";
-
-  camBtn.textContent =
-    cameraOn
-      ? "📹 Matikan Kamera"
-      : "📹 Nyalakan Kamera";
-
-  micBtn.classList.toggle(
-    "active",
-    !microphoneOn
-  );
-
-  camBtn.classList.toggle(
-    "active",
-    !cameraOn
-  );
-}
-
-
-function applyLocalMirror() {
-
-  localVideo.style.transform =
-    mirrorState
-      ? "scaleX(-1)"
-      : "scaleX(1)";
+    }
 
 }
 
 
-function applyRemoteMirror(value) {
+/* =========================
+   MEDIA
+========================= */
 
-  remoteVideo.style.transform =
-    value
-      ? "scaleX(-1)"
-      : "scaleX(1)";
+async function getMedia(){
+
+    localStream=
+        await navigator.mediaDevices
+        .getUserMedia({
+            video:true,
+            audio:true
+        });
+
+    localVideo.srcObject=
+        localStream;
+
+    audioTrack=
+        localStream.getAudioTracks()[0];
+
+    videoTrack=
+        localStream.getVideoTracks()[0];
 
 }
 
 
-async function getMedia() {
+/* =========================
+   MUTE BENAR-BENAR
+========================= */
 
-  localStream =
-    await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true
+async function setMicrophone(enabled){
+
+    mic=enabled;
+
+    if(!currentCall ||
+       !currentCall.peerConnection){
+
+        if(audioTrack){
+            audioTrack.enabled=enabled;
+        }
+
+        return;
+    }
+
+    const sender=
+        currentCall.peerConnection
+        .getSenders()
+        .find(s =>
+            s.track &&
+            s.track.kind==="audio"
+        );
+
+    if(!sender){
+        return;
+    }
+
+    if(enabled){
+
+        await sender.replaceTrack(
+            audioTrack
+        );
+
+        audioTrack.enabled=true;
+
+    }else{
+
+        await sender.replaceTrack(null);
+
+        audioTrack.enabled=false;
+
+    }
+
+}
+
+
+/* =========================
+   KAMERA
+========================= */
+
+function setCamera(enabled){
+
+    cam=enabled;
+
+    if(videoTrack){
+        videoTrack.enabled=enabled;
+    }
+
+    if(currentCall &&
+       currentCall.peerConnection){
+
+        const sender=
+            currentCall.peerConnection
+            .getSenders()
+            .find(s =>
+                s.track &&
+                s.track.kind==="video"
+            );
+
+        if(sender &&
+           sender.track){
+
+            sender.track.enabled=enabled;
+
+        }
+
+    }
+
+}
+
+
+/* =========================
+   TOMBOL
+========================= */
+
+function updateButtons(){
+
+    mirrorBtn.textContent=
+        mirror
+        ? "↔️ Balik Layar: ON"
+        : "↔️ Balik Layar";
+
+    micBtn.textContent=
+        mic
+        ? "🎙️ Matikan Mikrofon"
+        : "🎙️ Nyalakan Mikrofon";
+
+    camBtn.textContent=
+        cam
+        ? "📹 Matikan Kamera"
+        : "📹 Nyalakan Kamera";
+
+    micBtn.classList.toggle(
+        "active",
+        !mic
+    );
+
+    camBtn.classList.toggle(
+        "active",
+        !cam
+    );
+
+}
+
+
+/* =========================
+   DATA
+========================= */
+
+function receiveData(data){
+
+    if(!data ||
+       !data.type){
+
+        return;
+
+    }
+
+
+    if(data.type==="chat"){
+
+        addMessage(
+            String(data.text),
+            false
+        );
+
+    }
+
+
+    if(data.type==="mirror"){
+
+        remoteVideo.style.transform=
+            data.value
+            ? "scaleX(-1)"
+            : "scaleX(1)";
+
+    }
+
+
+    if(data.type==="state"){
+
+        remoteVideo.style.transform=
+            data.mirror
+            ? "scaleX(-1)"
+            : "scaleX(1)";
+
+    }
+
+
+    if(data.type==="peer-ended"){
+
+        endCall(false);
+
+    }
+
+}
+
+
+/* =========================
+   CONNECTION
+========================= */
+
+function setupConnection(connection){
+
+    dataConnection=connection;
+
+    connection.on("open",()=>{
+
+        sendData({
+            type:"state",
+            mirror:mirror,
+            mic:mic,
+            cam:cam
+        });
+
     });
 
-  localVideo.srcObject = localStream;
+    connection.on(
+        "data",
+        receiveData
+    );
 
-  updateButtons();
 }
 
 
-function changeSender(kind, enabled) {
+/* =========================
+   PEER READY
+========================= */
 
-  if (
-    !currentCall ||
-    !currentCall.peerConnection
-  ) {
-    return;
-  }
+peer.on("open",async()=>{
 
-  const senders =
-    currentCall.peerConnection.getSenders();
+    try{
 
-  senders.forEach(sender => {
+        await getMedia();
 
-    if (
-      sender.track &&
-      sender.track.kind === kind
-    ) {
-      sender.track.enabled = enabled;
+        setStatus(
+            "🟢 Siap. Tekan Mulai Video Call."
+        );
+
+    }catch(error){
+
+        console.error(error);
+
+        setStatus(
+            "🔴 Izin kamera/mikrofon ditolak."
+        );
+
     }
-
-  });
-
-}
-
-
-function receiveData(data) {
-
-  if (!data || !data.type) {
-    return;
-  }
-
-
-  if (data.type === "chat") {
-
-    addMessage(
-      String(data.text),
-      false
-    );
-
-  }
-
-
-  if (data.type === "mirror") {
-
-    applyRemoteMirror(
-      !!data.value
-    );
-
-  }
-
-
-  if (data.type === "state") {
-
-    applyRemoteMirror(
-      !!data.mirror
-    );
-
-  }
-
-
-  if (data.type === "peer-ended") {
-
-    endCall(false);
-
-  }
-
-}
-
-
-function setupDataConnection(connection) {
-
-  dataConnection = connection;
-
-  connection.on("open", () => {
-
-    sendData({
-      type: "state",
-      mirror: mirrorState,
-      mic: microphoneOn,
-      cam: cameraOn
-    });
-
-  });
-
-  connection.on("data", receiveData);
-
-  connection.on("close", () => {
-
-    if (dataConnection === connection) {
-      dataConnection = null;
-    }
-
-  });
-
-}
-
-
-peer.on("open", async () => {
-
-  try {
-
-    await getMedia();
-
-    setStatus(
-      "🟢 Siap. Tekan Mulai Video Call."
-    );
-
-  } catch (error) {
-
-    console.error(error);
-
-    setStatus(
-      "🔴 Kamera/mikrofon tidak mendapat izin."
-    );
-
-  }
 
 });
 
 
-peer.on("connection", connection => {
-
-  setupDataConnection(connection);
-
-});
-
-
-peer.on("error", error => {
-
-  console.error(error);
-
-  setStatus(
-    "🔴 Error koneksi: " + error.type
-  );
-
-});
-
-
-async function startCall() {
-
-  if (!localStream) {
-
-    try {
-      await getMedia();
-    } catch (error) {
-      return;
-    }
-
-  }
-
-  if (currentCall) {
-    return;
-  }
-
-
-  dataConnection =
-    peer.connect(
-      OWNER_ID,
-      {
-        reliable: true
-      }
-    );
-
-
-  setupDataConnection(
-    dataConnection
-  );
-
-
-  currentCall =
-    peer.call(
-      OWNER_ID,
-      localStream
-    );
-
-
-  currentCall.on(
-    "stream",
-    remoteStream => {
-
-      remoteVideo.srcObject =
-        remoteStream;
-
-      setStatus(
-        "🟢 Terhubung dengan pemilik."
-      );
-
-    }
-  );
-
-
-  currentCall.on(
-    "close",
-    () => {
-
-      currentCall = null;
-
-      remoteVideo.srcObject = null;
-
-      setStatus(
-        "⚪ Panggilan berakhir."
-      );
-
-    }
-  );
-
-
-  currentCall.on(
-    "error",
-    error => {
-
-      console.error(error);
-
-      setStatus(
-        "🔴 Panggilan gagal."
-      );
-
-    }
-  );
-
-}
-
-
-mirrorBtn.onclick = () => {
-
-  mirrorState = !mirrorState;
-
-  applyLocalMirror();
-
-  updateButtons();
-
-  sendData({
-    type: "mirror",
-    value: mirrorState
-  });
-
-};
-
-
-micBtn.onclick = () => {
-
-  microphoneOn = !microphoneOn;
-
-  if (localStream) {
-
-    localStream
-      .getAudioTracks()
-      .forEach(track => {
-
-        track.enabled =
-          microphoneOn;
-
-      });
-
-  }
-
-
-  changeSender(
-    "audio",
-    microphoneOn
-  );
-
-
-  updateButtons();
-
-
-  sendData({
-    type: "mic",
-    value: microphoneOn
-  });
-
-};
-
-
-camBtn.onclick = () => {
-
-  cameraOn = !cameraOn;
-
-  if (localStream) {
-
-    localStream
-      .getVideoTracks()
-      .forEach(track => {
-
-        track.enabled =
-          cameraOn;
-
-      });
-
-  }
-
-
-  changeSender(
-    "video",
-    cameraOn
-  );
-
-
-  updateButtons();
-
-
-  sendData({
-    type: "cam",
-    value: cameraOn
-  });
-
-};
-
-
-function endCall(notify = true) {
-
-  if (notify) {
-
-    sendData({
-      type: "peer-ended"
-    });
-
-  }
-
-
-  try {
-
-    if (currentCall) {
-      currentCall.close();
-    }
-
-  } catch (error) {}
-
-
-  currentCall = null;
-
-  remoteVideo.srcObject = null;
-
-  setStatus(
-    "⚪ Panggilan diakhiri."
-  );
-
-}
-
-
-endBtn.onclick = () => {
-
-  endCall(true);
-
-};
-
-
-function sendMessage() {
-
-  const text =
-    messageInput.value.trim();
-
-  if (!text) {
-    return;
-  }
-
-
-  addMessage(
-    text,
-    true
-  );
-
-
-  sendData({
-    type: "chat",
-    text: text
-  });
-
-
-  messageInput.value = "";
-
-}
-
-
-sendBtn.onclick = sendMessage;
-
-
-messageInput.addEventListener(
-  "keydown",
-  event => {
-
-    if (event.key === "Enter") {
-      sendMessage();
-    }
-
-  }
+peer.on(
+    "connection",
+    setupConnection
 );
 
 
-document
-  .querySelector(".container")
-  .insertAdjacentHTML(
-    "afterbegin",
-    '<button id="startBtn" class="start">📞 Mulai Video Call</button>'
-  );
+/* =========================
+   MULAI PANGGILAN
+========================= */
+
+startBtn.onclick=async()=>{
+
+    if(!localStream){
+
+        await getMedia();
+
+    }
+
+    if(currentCall){
+        return;
+    }
 
 
-document
-  .getElementById("startBtn")
-  .onclick = startCall;
+    dataConnection=
+        peer.connect(
+            OWNER_ID,
+            {
+                reliable:true
+            }
+        );
+
+    setupConnection(
+        dataConnection
+    );
+
+
+    currentCall=
+        peer.call(
+            OWNER_ID,
+            localStream
+        );
+
+
+    currentCall.on(
+        "stream",
+        remoteStream=>{
+
+            remoteVideo.srcObject=
+                remoteStream;
+
+            setStatus(
+                "🟢 Terhubung dengan pemilik."
+            );
+
+        }
+    );
+
+
+    currentCall.on(
+        "close",
+        ()=>{
+
+            currentCall=null;
+
+            remoteVideo.srcObject=null;
+
+            setStatus(
+                "⚪ Panggilan berakhir."
+            );
+
+        }
+    );
+
+};
+
+
+/* =========================
+   BALIK LAYAR
+========================= */
+
+mirrorBtn.onclick=()=>{
+
+    mirror=!mirror;
+
+    localVideo.style.transform=
+        mirror
+        ? "scaleX(-1)"
+        : "scaleX(1)";
+
+    updateButtons();
+
+    sendData({
+        type:"mirror",
+        value:mirror
+    });
+
+};
+
+
+/* =========================
+   MIKROFON
+========================= */
+
+micBtn.onclick=async()=>{
+
+    try{
+
+        await setMicrophone(
+            !mic
+        );
+
+        updateButtons();
+
+        sendData({
+            type:"mic",
+            value:mic
+        });
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+};
+
+
+/* =========================
+   KAMERA
+========================= */
+
+camBtn.onclick=()=>{
+
+    setCamera(
+        !cam
+    );
+
+    updateButtons();
+
+    sendData({
+        type:"cam",
+        value:cam
+    });
+
+};
+
+
+/* =========================
+   AKHIRI
+========================= */
+
+function endCall(notify=true){
+
+    if(notify){
+
+        sendData({
+            type:"peer-ended"
+        });
+
+    }
+
+
+    try{
+
+        if(currentCall){
+            currentCall.close();
+        }
+
+    }catch(error){}
+
+
+    currentCall=null;
+
+    remoteVideo.srcObject=null;
+
+    setStatus(
+        "⚪ Panggilan diakhiri."
+    );
+
+}
+
+
+endBtn.onclick=()=>{
+
+    endCall(true);
+
+};
+
+
+/* =========================
+   CHAT
+========================= */
+
+function sendMessage(){
+
+    const text=
+        input.value.trim();
+
+    if(!text){
+        return;
+    }
+
+
+    addMessage(
+        text,
+        true
+    );
+
+
+    sendData({
+        type:"chat",
+        text:text
+    });
+
+
+    input.value="";
+
+}
+
+
+sendBtn.onclick=
+    sendMessage;
+
+
+input.onkeydown=e=>{
+
+    if(e.key==="Enter"){
+        sendMessage();
+    }
+
+};
 
 
 updateButtons();
@@ -765,4 +857,4 @@ updateButtons();
 </script>
 
 </body>
-  </html>
+</html>
