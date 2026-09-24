@@ -15,7 +15,7 @@
 }
 
 body{
-  font-family:Arial, sans-serif;
+  font-family:Arial,sans-serif;
   background:#080b12;
   color:white;
   min-height:100vh;
@@ -28,7 +28,6 @@ body{
   padding:18px;
 }
 
-/* TOP */
 .top{
   display:flex;
   justify-content:space-between;
@@ -49,27 +48,24 @@ body{
   font-size:12px;
 }
 
-/* OWNER CARD */
 .owner-card{
   background:#111722;
   border:1px solid #202938;
   border-radius:20px;
   padding:22px;
-  margin-bottom:18px;
   text-align:center;
 }
 
 .owner-icon{
   width:70px;
   height:70px;
-  margin:auto;
+  margin:auto auto 15px;
   display:flex;
   align-items:center;
   justify-content:center;
   border-radius:20px;
   background:#080b12;
   font-size:35px;
-  margin-bottom:15px;
 }
 
 .owner-card h2{
@@ -83,10 +79,9 @@ body{
   line-height:1.5;
 }
 
-/* NOTIFICATION */
 .notify-btn{
   width:100%;
-  border:none;
+  border:0;
   border-radius:13px;
   padding:13px;
   margin-top:17px;
@@ -96,18 +91,13 @@ body{
   cursor:pointer;
 }
 
-.notify-btn:active{
-  transform:scale(.98);
-}
-
-/* INCOMING */
 .incoming{
   display:none;
   background:#152238;
   border:1px solid #31527d;
   border-radius:20px;
   padding:20px;
-  margin-bottom:18px;
+  margin-top:18px;
   text-align:center;
 }
 
@@ -134,7 +124,6 @@ body{
   padding:13px;
   color:white;
   font-weight:bold;
-  cursor:pointer;
 }
 
 .accept{
@@ -145,9 +134,9 @@ body{
   background:#d83242;
 }
 
-/* CALL */
 .call-screen{
   display:none;
+  margin-top:18px;
 }
 
 .call-card{
@@ -167,7 +156,6 @@ body{
   position:relative;
   width:100%;
   aspect-ratio:9/16;
-  max-height:600px;
   background:#000;
   border-radius:17px;
   overflow:hidden;
@@ -177,9 +165,8 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  display:block;
   background:#000;
-  transition:transform .25s ease;
+  transition:.25s;
 }
 
 .local-video{
@@ -193,7 +180,7 @@ body{
   border:2px solid white;
   background:#111;
   z-index:5;
-  transition:transform .25s ease;
+  transition:.25s;
 }
 
 .remote-status{
@@ -201,16 +188,15 @@ body{
   left:50%;
   top:50%;
   transform:translate(-50%,-50%);
-  background:rgba(0,0,0,.72);
+  background:rgba(0,0,0,.75);
   padding:12px 17px;
   border-radius:12px;
   font-size:14px;
   display:none;
-  z-index:4;
+  z-index:10;
   text-align:center;
 }
 
-/* CONTROLS */
 .controls{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -241,10 +227,8 @@ body{
   background:#d83242;
   color:white;
   font-weight:bold;
-  cursor:pointer;
 }
 
-/* CHAT */
 .chat{
   margin-top:15px;
   background:#0e141e;
@@ -324,7 +308,6 @@ body{
   margin-right:7px;
 }
 
-/* FOOTER */
 .footer{
   text-align:center;
   color:#596575;
@@ -341,10 +324,13 @@ body{
 
   <div class="top">
     <div class="logo">Home Call</div>
-    <div class="online" id="onlineStatus">🟡 Menghubungkan...</div>
+    <div class="online" id="onlineStatus">
+      🟡 Menghubungkan...
+    </div>
   </div>
 
   <div class="owner-card">
+
     <div class="owner-icon">🏠</div>
 
     <h2>Owner</h2>
@@ -356,9 +342,12 @@ body{
     <button class="notify-btn" id="notifyBtn">
       🔔 Aktifkan Notifikasi & Dering
     </button>
+
   </div>
 
+
   <!-- PANGGILAN MASUK -->
+
   <div class="incoming" id="incomingBox">
 
     <h3>📞 Panggilan Masuk</h3>
@@ -381,7 +370,9 @@ body{
 
   </div>
 
+
   <!-- VIDEO CALL -->
+
   <div class="call-screen" id="callScreen">
 
     <div class="call-card">
@@ -407,40 +398,38 @@ body{
           playsinline>
         </video>
 
-        <div class="remote-status" id="remoteStatus"></div>
+        <div
+          class="remote-status"
+          id="remoteStatus">
+        </div>
 
       </div>
 
-      <!-- CONTROLS -->
+
       <div class="controls">
 
-        <button
-          class="control"
-          id="micBtn">
+        <button class="control" id="micBtn">
           🎙️ Mic ON
         </button>
 
-        <button
-          class="control"
-          id="cameraBtn">
+        <button class="control" id="cameraBtn">
           🎥 Kamera ON
         </button>
 
-        <button
-          class="control"
-          id="mirrorBtn">
+        <button class="control" id="mirrorBtn">
           🔄 Mirror
         </button>
 
       </div>
 
-      <button
-        class="end-call"
-        id="endBtn">
+
+      <button class="end-call" id="endBtn">
         🔴 Akhiri Panggilan
       </button>
 
+
       <!-- CHAT -->
+
       <div class="chat">
 
         <div
@@ -493,6 +482,7 @@ body{
 
   </div>
 
+
   <div class="footer">
     Home Call • Video Communication
   </div>
@@ -501,6 +491,10 @@ body{
 
 
 <script>
+
+/* =========================
+   HOME CALL OWNER
+   ========================= */
 
 const OWNER_ID = "homecall-owner-2026";
 
@@ -514,78 +508,114 @@ let micEnabled = true;
 let cameraEnabled = true;
 let mirrorEnabled = false;
 
-let ringtoneInterval = null;
+let ringtoneTimer = null;
 let audioContext = null;
 
 
 /* ELEMENT */
-const onlineStatus = document.getElementById("onlineStatus");
-const serverText = document.getElementById("serverText");
 
-const incomingBox = document.getElementById("incomingBox");
-const acceptBtn = document.getElementById("acceptBtn");
-const rejectBtn = document.getElementById("rejectBtn");
+const onlineStatus =
+  document.getElementById("onlineStatus");
 
-const callScreen = document.getElementById("callScreen");
+const serverText =
+  document.getElementById("serverText");
 
-const remoteVideo = document.getElementById("remoteVideo");
-const localVideo = document.getElementById("localVideo");
-const remoteStatus = document.getElementById("remoteStatus");
+const incomingBox =
+  document.getElementById("incomingBox");
 
-const micBtn = document.getElementById("micBtn");
-const cameraBtn = document.getElementById("cameraBtn");
-const mirrorBtn = document.getElementById("mirrorBtn");
+const acceptBtn =
+  document.getElementById("acceptBtn");
 
-const endBtn = document.getElementById("endBtn");
+const rejectBtn =
+  document.getElementById("rejectBtn");
 
-const chatMessages = document.getElementById("chatMessages");
-const chatInput = document.getElementById("chatInput");
-const sendBtn = document.getElementById("sendBtn");
+const callScreen =
+  document.getElementById("callScreen");
 
-const emojiBtn = document.getElementById("emojiBtn");
-const emojiPanel = document.getElementById("emojiPanel");
+const remoteVideo =
+  document.getElementById("remoteVideo");
 
-const notifyBtn = document.getElementById("notifyBtn");
+const localVideo =
+  document.getElementById("localVideo");
+
+const remoteStatus =
+  document.getElementById("remoteStatus");
+
+const micBtn =
+  document.getElementById("micBtn");
+
+const cameraBtn =
+  document.getElementById("cameraBtn");
+
+const mirrorBtn =
+  document.getElementById("mirrorBtn");
+
+const endBtn =
+  document.getElementById("endBtn");
+
+const chatMessages =
+  document.getElementById("chatMessages");
+
+const chatInput =
+  document.getElementById("chatInput");
+
+const sendBtn =
+  document.getElementById("sendBtn");
+
+const emojiBtn =
+  document.getElementById("emojiBtn");
+
+const emojiPanel =
+  document.getElementById("emojiPanel");
+
+const notifyBtn =
+  document.getElementById("notifyBtn");
 
 
 /* STATUS */
-function setStatus(status, text){
 
-  onlineStatus.textContent = status;
-  serverText.textContent = text;
+function status(statusText, message){
+
+  onlineStatus.textContent = statusText;
+  serverText.textContent = message;
 
 }
 
 
-/* CEK PEERJS */
+/* =========================
+   CEK PEERJS
+   ========================= */
+
 if(typeof Peer === "undefined"){
 
-  setStatus(
-    "🔴 Error",
-    "PeerJS gagal dimuat. Periksa koneksi internet."
+  status(
+    "🔴 PeerJS Error",
+    "PeerJS tidak berhasil dimuat. Periksa internet."
   );
+
+}else{
+
+  createPeer();
 
 }
 
 
-/* BUAT PEER */
+/* =========================
+   CONNECT PEER
+   ========================= */
+
 function createPeer(){
 
-  if(typeof Peer === "undefined"){
-    return;
-  }
-
-  setStatus(
+  status(
     "🟡 Menghubungkan...",
-    "Sedang menghubungkan Owner ke server..."
+    "Menghubungkan ke server PeerJS..."
   );
 
   try{
 
     /*
-      Sengaja memakai PeerJS Cloud default.
-
-      Tidak memakai host/path/key tambahan.
+      PeerJS Cloud default.
+      Tidak memakai host/key tambahan.
     */
 
     peer = new Peer(OWNER_ID);
@@ -594,7 +624,7 @@ function createPeer(){
 
     console.error(error);
 
-    setStatus(
+    status(
       "🔴 Error",
       "Gagal membuat koneksi PeerJS."
     );
@@ -605,11 +635,28 @@ function createPeer(){
 
 
   /* SERVER TERHUBUNG */
+
   peer.on("open", function(id){
 
-    console.log("Owner online:", id);
+    console.log(
+      "======================"
+    );
 
-    setStatus(
+    console.log(
+      "HOME CALL OWNER ONLINE"
+    );
+
+    console.log(
+      "Peer ID:",
+      id
+    );
+
+    console.log(
+      "======================"
+    );
+
+
+    status(
       "🟢 Owner Online",
       "Terhubung. Owner siap menerima panggilan."
     );
@@ -617,15 +664,92 @@ function createPeer(){
   });
 
 
-  /* TERPUTUS */
+  /* ERROR */
+
+  peer.on("error", function(error){
+
+    console.error(
+      "PEERJS ERROR:",
+      error
+    );
+
+
+    let message =
+      "Terjadi kesalahan koneksi.";
+
+
+    if(error.type === "unavailable-id"){
+
+      message =
+        "ID Owner sedang dipakai. Tutup tab Owner lain.";
+
+    }
+
+    else if(error.type === "network"){
+
+      message =
+        "Internet terputus atau jaringan memblokir koneksi.";
+
+    }
+
+    else if(error.type === "server-error"){
+
+      message =
+        "Server PeerJS bermasalah. Coba lagi.";
+
+    }
+
+    else if(error.type === "socket-error"){
+
+      message =
+        "Koneksi socket ke server gagal.";
+
+    }
+
+    else if(error.type === "socket-closed"){
+
+      message =
+        "Koneksi ke server ditutup.";
+
+    }
+
+    else if(error.type === "ssl-unavailable"){
+
+      message =
+        "Koneksi HTTPS/SSL bermasalah.";
+
+    }
+
+    else if(error.message){
+
+      message =
+        error.message;
+
+    }
+
+
+    status(
+      "🔴 Gagal",
+      message
+    );
+
+  });
+
+
+  /* DISCONNECT */
+
   peer.on("disconnected", function(){
 
-    console.log("Peer disconnected");
-
-    setStatus(
-      "🟠 Terputus",
-      "Koneksi terputus. Mencoba menghubungkan kembali..."
+    console.log(
+      "PeerJS disconnected"
     );
+
+
+    status(
+      "🟠 Terputus",
+      "Koneksi terputus. Mencoba menyambungkan kembali..."
+    );
+
 
     setTimeout(function(){
 
@@ -636,96 +760,27 @@ function createPeer(){
       ){
 
         try{
+
           peer.reconnect();
+
         }catch(error){
+
           console.error(error);
+
         }
 
       }
 
-    },2000);
+    },3000);
 
   });
 
 
-  /* ERROR */
-  peer.on("error", function(error){
+  /* CLOSE */
 
-    console.error(
-      "PeerJS error:",
-      error.type,
-      error
-    );
-
-
-    if(error.type === "unavailable-id"){
-
-      setStatus(
-        "🔴 ID Dipakai",
-        "ID Owner sedang dipakai tab/browser lain. Tutup Owner yang lain."
-      );
-
-      return;
-    }
-
-
-    if(error.type === "network"){
-
-      setStatus(
-        "🔴 Jaringan",
-        "Koneksi internet bermasalah."
-      );
-
-      return;
-    }
-
-
-    if(error.type === "server-error"){
-
-      setStatus(
-        "🔴 Server",
-        "Server PeerJS mengalami masalah."
-      );
-
-      return;
-    }
-
-
-    if(error.type === "socket-error" ||
-       error.type === "socket-closed"){
-
-      setStatus(
-        "🟠 Koneksi",
-        "Koneksi ke server terputus."
-      );
-
-      return;
-    }
-
-
-    if(error.type === "ssl-unavailable"){
-
-      setStatus(
-        "🔴 SSL",
-        "Koneksi aman tidak tersedia."
-      );
-
-      return;
-    }
-
-
-    setStatus(
-      "🔴 Error",
-      "PeerJS: " + (error.message || error.type)
-    );
-
-  });
-
-
-  /* CONNECTION DITUTUP */
   peer.on("close", function(){
 
-    setStatus(
+    status(
       "🔴 Offline",
       "Koneksi Owner ditutup."
     );
@@ -734,9 +789,13 @@ function createPeer(){
 
 
   /* DATA CONNECTION */
+
   peer.on("connection", function(conn){
 
-    console.log("Data connection masuk");
+    console.log(
+      "Data connection masuk:",
+      conn.peer
+    );
 
     dataConn = conn;
 
@@ -745,23 +804,34 @@ function createPeer(){
   });
 
 
-  /* PANGGILAN MASUK */
+  /* PANGGILAN */
+
   peer.on("call", function(call){
 
-    console.log("Panggilan masuk");
+    console.log(
+      "Panggilan masuk dari:",
+      call.peer
+    );
 
-    if(activeCall || incomingCall){
+
+    if(
+      activeCall ||
+      incomingCall
+    ){
 
       try{
         call.close();
       }catch(e){}
 
       return;
+
     }
+
 
     incomingCall = call;
 
-    incomingBox.style.display = "block";
+    incomingBox.style.display =
+      "block";
 
     startRingtone();
 
@@ -772,23 +842,27 @@ function createPeer(){
 }
 
 
-/* JALANKAN PEER */
-createPeer();
+/* =========================
+   DATA CONNECTION
+   ========================= */
 
-
-/* DATA CONNECTION */
 function setupDataConnection(conn){
 
   conn.on("open", function(){
 
-    console.log("Data connection terbuka");
+    console.log(
+      "Data connection OPEN"
+    );
 
   });
 
 
   conn.on("data", function(data){
 
-    console.log("Data diterima:", data);
+    console.log(
+      "DATA:",
+      data
+    );
 
 
     if(!data || !data.type){
@@ -796,7 +870,6 @@ function setupDataConnection(conn){
     }
 
 
-    /* CHAT */
     if(data.type === "chat"){
 
       addMessage(
@@ -807,57 +880,43 @@ function setupDataConnection(conn){
     }
 
 
-    /* MIC */
     if(data.type === "mic"){
 
-      if(data.enabled){
-
-        showRemoteStatus(
-          "🎙️ Mikrofon menyala",
-          1200
-        );
-
-      }else{
-
-        showRemoteStatus(
-          "🔇 Mikrofon dimatikan",
-          2500
-        );
-
-      }
+      showRemoteStatus(
+        data.enabled
+          ? "🎙️ Mikrofon menyala"
+          : "🔇 Mikrofon dimatikan",
+        2200
+      );
 
     }
 
 
-    /* CAMERA */
     if(data.type === "camera"){
 
-      if(data.enabled){
-
-        showRemoteStatus(
-          "🎥 Kamera menyala",
-          1200
-        );
-
-      }else{
-
-        showRemoteStatus(
-          "📷 Kamera dimatikan",
-          2500
-        );
-
-      }
+      showRemoteStatus(
+        data.enabled
+          ? "🎥 Kamera menyala"
+          : "📷 Kamera dimatikan",
+        2200
+      );
 
     }
 
 
-    /* MIRROR */
     if(data.type === "mirror"){
 
       remoteVideo.style.transform =
         data.enabled
           ? "scaleX(-1)"
           : "scaleX(1)";
+
+    }
+
+
+    if(data.type === "callEnded"){
+
+      endCall(false);
 
     }
 
@@ -878,7 +937,7 @@ function setupDataConnection(conn){
   conn.on("error", function(error){
 
     console.error(
-      "Data connection error:",
+      "Data error:",
       error
     );
 
@@ -887,94 +946,125 @@ function setupDataConnection(conn){
 }
 
 
-/* MINTA MEDIA */
+/* =========================
+   MEDIA
+   ========================= */
+
 async function getLocalMedia(){
 
   if(localStream){
+
     return localStream;
+
   }
 
-  try{
 
-    localStream =
-      await navigator.mediaDevices.getUserMedia({
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
 
-        video:true,
-        audio:true
-
-      });
-
-    localVideo.srcObject = localStream;
-
-    return localStream;
-
-  }catch(error){
-
-    console.error(error);
-
-    alert(
-      "Kamera dan mikrofon tidak bisa digunakan.\n\n" +
-      "Pastikan izin kamera dan mikrofon sudah diberikan."
+    throw new Error(
+      "Browser tidak mendukung kamera/mikrofon."
     );
 
-    throw error;
-
   }
+
+
+  localStream =
+    await navigator.mediaDevices.getUserMedia({
+
+      video:true,
+      audio:true
+
+    });
+
+
+  localVideo.srcObject =
+    localStream;
+
+
+  return localStream;
 
 }
 
 
-/* TERIMA PANGGILAN */
-acceptBtn.onclick = async function(){
+/* =========================
+   TERIMA
+   ========================= */
+
+acceptBtn.onclick =
+async function(){
 
   if(!incomingCall){
     return;
   }
 
+
   stopRingtone();
+
 
   try{
 
     const stream =
       await getLocalMedia();
 
+
     incomingCall.answer(stream);
 
-    activeCall = incomingCall;
+    activeCall =
+      incomingCall;
 
     incomingCall = null;
 
-    incomingBox.style.display = "none";
+    incomingBox.style.display =
+      "none";
 
-    callScreen.style.display = "block";
-
-
-    activeCall.on("stream", function(remoteStream){
-
-      remoteVideo.srcObject = remoteStream;
-
-      remoteVideo.play().catch(()=>{});
-
-    });
+    callScreen.style.display =
+      "block";
 
 
-    activeCall.on("close", function(){
+    activeCall.on(
+      "stream",
+      function(stream){
 
-      endCall(false);
+        console.log(
+          "Remote stream diterima"
+        );
 
-    });
+        remoteVideo.srcObject =
+          stream;
+
+        remoteVideo.play()
+          .catch(function(){});
+
+      }
+    );
 
 
-    activeCall.on("error", function(error){
+    activeCall.on(
+      "close",
+      function(){
 
-      console.error(
-        "Call error:",
-        error
-      );
+        endCall(false);
 
-      endCall(false);
+      }
+    );
 
-    });
+
+    activeCall.on(
+      "error",
+      function(error){
+
+        console.error(
+          "CALL ERROR:",
+          error
+        );
+
+        endCall(false);
+
+      }
+    );
 
 
     updateButtons();
@@ -983,60 +1073,86 @@ acceptBtn.onclick = async function(){
 
     console.error(error);
 
+    alert(
+      "Kamera/mikrofon tidak bisa digunakan.\n\n" +
+      "Pastikan izin kamera dan mikrofon diberikan."
+    );
+
+
     try{
 
       incomingCall.close();
 
     }catch(e){}
 
+
     incomingCall = null;
 
-    incomingBox.style.display = "none";
+    incomingBox.style.display =
+      "none";
 
   }
 
 };
 
 
-/* TOLAK */
-rejectBtn.onclick = function(){
+/* =========================
+   TOLAK
+   ========================= */
+
+rejectBtn.onclick =
+function(){
 
   stopRingtone();
+
 
   if(incomingCall){
 
     try{
+
       incomingCall.close();
+
     }catch(e){}
 
   }
 
+
   incomingCall = null;
 
-  incomingBox.style.display = "none";
+  incomingBox.style.display =
+    "none";
 
 };
 
 
-/* MIC */
-micBtn.onclick = function(){
+/* =========================
+   MIC
+   ========================= */
+
+micBtn.onclick =
+function(){
 
   if(!localStream){
     return;
   }
 
+
   const track =
     localStream.getAudioTracks()[0];
+
 
   if(!track){
     return;
   }
 
-  micEnabled = !micEnabled;
 
-  track.enabled = micEnabled;
+  micEnabled =
+    !micEnabled;
 
-  updateButtons();
+
+  track.enabled =
+    micEnabled;
+
 
   sendData({
 
@@ -1045,28 +1161,40 @@ micBtn.onclick = function(){
 
   });
 
+
+  updateButtons();
+
 };
 
 
-/* CAMERA */
-cameraBtn.onclick = function(){
+/* =========================
+   CAMERA
+   ========================= */
+
+cameraBtn.onclick =
+function(){
 
   if(!localStream){
     return;
   }
 
+
   const track =
     localStream.getVideoTracks()[0];
+
 
   if(!track){
     return;
   }
 
-  cameraEnabled = !cameraEnabled;
 
-  track.enabled = cameraEnabled;
+  cameraEnabled =
+    !cameraEnabled;
 
-  updateButtons();
+
+  track.enabled =
+    cameraEnabled;
+
 
   sendData({
 
@@ -1075,20 +1203,28 @@ cameraBtn.onclick = function(){
 
   });
 
+
+  updateButtons();
+
 };
 
 
-/* MIRROR */
-mirrorBtn.onclick = function(){
+/* =========================
+   MIRROR
+   ========================= */
 
-  mirrorEnabled = !mirrorEnabled;
+mirrorBtn.onclick =
+function(){
+
+  mirrorEnabled =
+    !mirrorEnabled;
+
 
   localVideo.style.transform =
     mirrorEnabled
       ? "scaleX(-1)"
       : "scaleX(1)";
 
-  updateButtons();
 
   sendData({
 
@@ -1097,10 +1233,16 @@ mirrorBtn.onclick = function(){
 
   });
 
+
+  updateButtons();
+
 };
 
 
-/* UPDATE BUTTON */
+/* =========================
+   BUTTON
+   ========================= */
+
 function updateButtons(){
 
   micBtn.textContent =
@@ -1108,10 +1250,12 @@ function updateButtons(){
       ? "🎙️ Mic ON"
       : "🔇 Mic OFF";
 
+
   cameraBtn.textContent =
     cameraEnabled
       ? "🎥 Kamera ON"
       : "📷 Kamera OFF";
+
 
   mirrorBtn.textContent =
     mirrorEnabled
@@ -1124,10 +1268,12 @@ function updateButtons(){
     !micEnabled
   );
 
+
   cameraBtn.classList.toggle(
     "off",
     !cameraEnabled
   );
+
 
   mirrorBtn.classList.toggle(
     "off",
@@ -1137,7 +1283,10 @@ function updateButtons(){
 }
 
 
-/* KIRIM DATA */
+/* =========================
+   SEND DATA
+   ========================= */
+
 function sendData(data){
 
   if(
@@ -1152,7 +1301,7 @@ function sendData(data){
     }catch(error){
 
       console.error(
-        "Gagal mengirim data:",
+        "Send data error:",
         error
       );
 
@@ -1163,11 +1312,15 @@ function sendData(data){
 }
 
 
-/* CHAT */
+/* =========================
+   CHAT
+   ========================= */
+
 function sendMessage(){
 
   const text =
     chatInput.value.trim();
+
 
   if(!text){
     return;
@@ -1193,7 +1346,10 @@ function sendMessage(){
 }
 
 
-/* ENTER CHAT */
+sendBtn.onclick =
+sendMessage;
+
+
 chatInput.addEventListener(
   "keydown",
   function(event){
@@ -1210,22 +1366,28 @@ chatInput.addEventListener(
 );
 
 
-/* SEND BUTTON */
-sendBtn.onclick = sendMessage;
+/* =========================
+   MESSAGE
+   ========================= */
 
-
-/* TAMBAH PESAN */
-function addMessage(text, type){
+function addMessage(text,type){
 
   const message =
     document.createElement("div");
 
+
   message.className =
     "message " + type;
 
-  message.textContent = text;
 
-  chatMessages.appendChild(message);
+  message.textContent =
+    text;
+
+
+  chatMessages.appendChild(
+    message
+  );
+
 
   chatMessages.scrollTop =
     chatMessages.scrollHeight;
@@ -1233,8 +1395,12 @@ function addMessage(text, type){
 }
 
 
-/* EMOJI */
-emojiBtn.onclick = function(){
+/* =========================
+   EMOJI
+   ========================= */
+
+emojiBtn.onclick =
+function(){
 
   emojiPanel.style.display =
     emojiPanel.style.display === "block"
@@ -1244,14 +1410,15 @@ emojiBtn.onclick = function(){
 };
 
 
-/* PILIH EMOJI */
-document.querySelectorAll(".emoji")
-.forEach(function(el){
+document
+.querySelectorAll(".emoji")
+.forEach(function(element){
 
-  el.onclick = function(){
+  element.onclick =
+  function(){
 
     chatInput.value +=
-      el.textContent;
+      element.textContent;
 
     chatInput.focus();
 
@@ -1260,40 +1427,53 @@ document.querySelectorAll(".emoji")
 });
 
 
-/* STATUS REMOTE */
-function showRemoteStatus(text, duration){
+/* =========================
+   REMOTE STATUS
+   ========================= */
 
-  remoteStatus.textContent = text;
+let remoteStatusTimer = null;
+
+function showRemoteStatus(
+  text,
+  duration
+){
+
+  remoteStatus.textContent =
+    text;
 
   remoteStatus.style.display =
     "block";
 
 
   clearTimeout(
-    showRemoteStatus.timer
+    remoteStatusTimer
   );
 
 
-  showRemoteStatus.timer =
+  remoteStatusTimer =
     setTimeout(function(){
 
       remoteStatus.style.display =
         "none";
 
-    }, duration);
+    },duration);
 
 }
 
 
-/* NOTIFIKASI */
-notifyBtn.onclick = async function(){
+/* =========================
+   NOTIFICATION
+   ========================= */
+
+notifyBtn.onclick =
+async function(){
 
   try{
 
-    /* Unlock audio browser */
     const AudioContextClass =
       window.AudioContext ||
       window.webkitAudioContext;
+
 
     if(AudioContextClass){
 
@@ -1301,7 +1481,11 @@ notifyBtn.onclick = async function(){
         audioContext ||
         new AudioContextClass();
 
-      if(audioContext.state === "suspended"){
+
+      if(
+        audioContext.state ===
+        "suspended"
+      ){
 
         await audioContext.resume();
 
@@ -1310,11 +1494,13 @@ notifyBtn.onclick = async function(){
     }
 
 
-    /* Permission notification */
-    if("Notification" in window){
+    if(
+      "Notification" in window
+    ){
 
       const permission =
         await Notification.requestPermission();
+
 
       if(permission === "granted"){
 
@@ -1328,88 +1514,11 @@ notifyBtn.onclick = async function(){
 
       }
 
-    }else{
-
-      notifyBtn.textContent =
-        "⚠️ Browser Tidak Mendukung";
-
     }
 
 
-    /* Bunyi tes */
     playBeep();
 
   }catch(error){
 
-    console.error(error);
-
-  }
-
-};
-
-
-/* NOTIFIKASI PANGGILAN */
-function showNotification(){
-
-  if(
-    "Notification" in window &&
-    Notification.permission === "granted"
-  ){
-
-    try{
-
-      new Notification(
-        "📞 Home Call",
-        {
-          body:"Ada panggilan video masuk.",
-          icon:""
-        }
-      );
-
-    }catch(error){
-
-      console.error(error);
-
-    }
-
-  }
-
-}
-
-
-/* BUNYI */
-function playBeep(){
-
-  try{
-
-    const AudioContextClass =
-      window.AudioContext ||
-      window.webkitAudioContext;
-
-    if(!AudioContextClass){
-      return;
-    }
-
-    audioContext =
-      audioContext ||
-      new AudioContextClass();
-
-
-    const oscillator =
-      audioContext.createOscillator();
-
-    const gain =
-      audioContext.createGain();
-
-
-    oscillator.type = "sine";
-
-    oscillator.frequency.value =
-      880;
-
-    gain.gain.value =
-      0.12;
-
-
-    oscillator.connect(gain);
-    
+    console.err
