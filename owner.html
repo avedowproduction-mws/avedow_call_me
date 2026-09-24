@@ -101,7 +101,7 @@ button {
 .controls {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  gap: 9px;
   margin-top: 15px;
 }
 
@@ -225,18 +225,21 @@ playsinline>
 <div class="controls">
 
 <button onclick="switchCamera()">
-🔄 Kamera
+🔄 Ganti Kamera
 </button>
 
-<button onclick="toggleMirror()">
+<button onclick="toggleMirror()"
+        id="mirrorBtn">
 ↔️ Balik Layar
 </button>
 
-<button onclick="toggleMic()" id="micBtn">
+<button onclick="toggleMic()"
+        id="micBtn">
 🎙️ Mic ON
 </button>
 
-<button onclick="toggleCamera()" id="videoBtn">
+<button onclick="toggleCamera()"
+        id="videoBtn">
 📹 Kamera ON
 </button>
 
@@ -244,9 +247,8 @@ playsinline>
 💬 Kirim
 </button>
 
-<button
-class="danger"
-onclick="endCall()">
+<button onclick="endCall()"
+        class="danger">
 🔴 Akhiri
 </button>
 
@@ -281,7 +283,7 @@ Kirim
 const OWNER_ID =
 "homecall-owner-2026";
 
-let peer;
+let peer = null;
 let incomingCall = null;
 let currentCall = null;
 
@@ -289,8 +291,8 @@ let dataConnection = null;
 
 let localStream = null;
 let currentVideoTrack = null;
+let currentCameraId = null;
 
-let usingFrontCamera = true;
 let mirrored = false;
 let micEnabled = true;
 let cameraEnabled = true;
@@ -307,12 +309,6 @@ document.getElementById("callArea");
 
 const message =
 document.getElementById("message");
-
-const acceptBtn =
-document.getElementById("acceptBtn");
-
-const rejectBtn =
-document.getElementById("rejectBtn");
 
 const remoteVideo =
 document.getElementById("remoteVideo");
@@ -342,12 +338,7 @@ peer = new Peer(
 );
 
 
-peer.on("open", function(id) {
-
-  console.log(
-    "Owner online:",
-    id
-  );
+peer.on("open", function() {
 
   status.textContent =
     "🟢 Owner online — menunggu panggilan";
@@ -373,17 +364,18 @@ peer.on("call", function(call) {
 
 
 /* =========================
-   DATA CHAT MASUK
+   DATA MASUK
 ========================= */
 
 peer.on("connection", function(conn) {
 
   dataConnection = conn;
 
+
   conn.on("open", function() {
 
     console.log(
-      "Chat terhubung"
+      "Koneksi data terbuka"
     );
 
   });
@@ -391,18 +383,7 @@ peer.on("connection", function(conn) {
 
   conn.on("data", function(data) {
 
-    if (
-      data &&
-      data.type === "message"
-    ) {
-
-      addMessage(
-        "Penelpon",
-        data.text,
-        false
-      );
-
-    }
+    receiveData(data);
 
   });
 
@@ -413,7 +394,7 @@ peer.on("connection", function(conn) {
    TERIMA PANGGILAN
 ========================= */
 
-acceptBtn.onclick =
+document.getElementById("acceptBtn").onclick =
 async function() {
 
   if (!incomingCall)
@@ -421,10 +402,6 @@ async function() {
 
 
   try {
-
-    message.textContent =
-      "Meminta izin kamera dan mikrofon...";
-
 
     localStream =
       await navigator.mediaDevices
@@ -436,21 +413,27 @@ async function() {
       });
 
 
-    currentCall =
-      incomingCall;
-
-
     currentVideoTrack =
       localStream.getVideoTracks()[0];
+
+
+    if (currentVideoTrack) {
+
+      const settings =
+        currentVideoTrack.getSettings();
+
+      currentCameraId =
+        settings.deviceId || null;
+
+    }
 
 
     localVideo.srcObject =
       localStream;
 
 
-    await localVideo
-      .play()
-      .catch(() => {});
+    currentCall =
+      incomingCall;
 
 
     currentCall.answer(
@@ -466,9 +449,6 @@ async function() {
 
     status.textContent =
       "🟢 Terhubung";
-
-    message.textContent =
-      "Menunggu video penelpon...";
 
 
     currentCall.on(
@@ -498,18 +478,6 @@ async function() {
     );
 
 
-    currentCall.on(
-      "error",
-      function(error) {
-
-        console.log(error);
-
-        message.textContent =
-          "❌ Koneksi video gagal";
-
-      }
-    );
-
   }
 
   catch(error) {
@@ -526,55 +494,145 @@ async function() {
 
 
 /* =========================
-   TOLAK
+   DATA / CHAT / MIRROR
 ========================= */
 
-rejectBtn.onclick =
-function() {
+function receiveData(data) {
 
-  if (incomingCall) {
+  if (!data) return;
 
-    incomingCall.close();
+
+  /* PESAN */
+
+  if (data.type === "message") {
+
+    addMessage(
+      "Penelpon",
+      data.text,
+      false
+    );
 
   }
 
-  incomingCall = null;
 
-  incoming.style.display =
-    "none";
+  /* MIRROR DARI PENELPON */
 
-  status.textContent =
-    "🟢 Owner online — menunggu panggilan";
+  if (data.type === "mirror") {
 
-};
+    remoteVideo.style.transform =
+      data.value
+      ? "scaleX(-1)"
+      : "scaleX(1)";
+
+  }
+
+
+  /* STATUS MIC PENELPON */
+
+  if (data.type === "mic") {
+
+    if (data.value) {
+
+      message.textContent =
+        "🎙️ Mikrofon penelpon aktif";
+
+    }
+
+    else {
+
+      message.textContent =
+        "🔇 Mikrofon penelpon dimatikan";
+
+    }
+
+  }
+
+
+  /* STATUS KAMERA PENELPON */
+
+  if (data.type === "camera") {
+
+    if (data.value) {
+
+      message.textContent =
+        "📹 Kamera penelpon aktif";
+
+    }
+
+    else {
+
+      message.textContent =
+        "🚫 Kamera penelpon dimatikan";
+
+    }
+
+  }
+
+}
 
 
 /* =========================
-   GANTI KAMERA
+   GANTI KAMERA OWNER
 ========================= */
 
 async function switchCamera() {
 
-  if (!currentCall) {
+  if (!currentCall || !localStream) {
 
-    alert(
-      "Panggilan belum dimulai."
-    );
+    alert("Panggilan belum dimulai.");
 
     return;
+
   }
 
 
   try {
 
-    usingFrontCamera =
-      !usingFrontCamera;
+    const devices =
+      await navigator.mediaDevices.enumerateDevices();
 
 
-    const facing =
-      usingFrontCamera
-      ? "user"
-      : "environment";
+    const cameras =
+      devices.filter(function(device) {
+
+        return device.kind === "videoinput";
+
+      });
+
+
+    if (cameras.length < 2) {
+
+      alert(
+        "Kamera kedua tidak ditemukan."
+      );
+
+      return;
+
+    }
+
+
+    let index =
+      cameras.findIndex(function(camera) {
+
+        return camera.deviceId ===
+               currentCameraId;
+
+      });
+
+
+    if (index < 0) {
+
+      index = 0;
+
+    }
+
+
+    const nextIndex =
+      (index + 1) % cameras.length;
+
+
+    const nextCamera =
+      cameras[nextIndex];
 
 
     const newStream =
@@ -582,8 +640,9 @@ async function switchCamera() {
       .getUserMedia({
 
         video: {
-          facingMode: {
-            ideal: facing
+          deviceId: {
+            exact:
+            nextCamera.deviceId
           }
         },
 
@@ -599,28 +658,26 @@ async function switchCamera() {
     const sender =
       currentCall.peerConnection
       .getSenders()
-      .find(function(s) {
+      .find(function(sender) {
 
-        return s.track &&
-               s.track.kind === "video";
+        return sender.track &&
+               sender.track.kind === "video";
 
       });
 
 
-    if (sender) {
+    if (!sender) {
 
-      await sender.replaceTrack(
-        newTrack
+      throw new Error(
+        "Track video tidak ditemukan."
       );
 
     }
 
 
-    if (currentVideoTrack) {
-
-      currentVideoTrack.stop();
-
-    }
+    await sender.replaceTrack(
+      newTrack
+    );
 
 
     const oldTrack =
@@ -628,6 +685,8 @@ async function switchCamera() {
 
 
     if (oldTrack) {
+
+      oldTrack.stop();
 
       localStream.removeTrack(
         oldTrack
@@ -644,17 +703,26 @@ async function switchCamera() {
     currentVideoTrack =
       newTrack;
 
+    currentCameraId =
+      nextCamera.deviceId;
+
 
     localVideo.srcObject =
       localStream;
 
 
+    newTrack.enabled =
+      cameraEnabled;
+
+
+    message.textContent =
+      "🔄 Kamera berhasil diganti";
+
   }
 
   catch(error) {
 
-    usingFrontCamera =
-      !usingFrontCamera;
+    console.error(error);
 
     alert(
       "Tidak bisa mengganti kamera.\n\n" +
@@ -667,7 +735,7 @@ async function switchCamera() {
 
 
 /* =========================
-   BALIK LAYAR
+   MIRROR OWNER
 ========================= */
 
 function toggleMirror() {
@@ -681,11 +749,17 @@ function toggleMirror() {
     ? "scaleX(-1)"
     : "scaleX(1)";
 
+
+  document.getElementById("mirrorBtn").textContent =
+    mirrored
+    ? "↔️ Layar Normal"
+    : "↔️ Balik Layar";
+
 }
 
 
 /* =========================
-   MUTE
+   MIC OWNER
 ========================= */
 
 function toggleMic() {
@@ -705,6 +779,7 @@ function toggleMic() {
     );
 
     return;
+
   }
 
 
@@ -712,19 +787,38 @@ function toggleMic() {
     !micEnabled;
 
 
-  tracks.forEach(
-    function(track) {
+  tracks.forEach(function(track) {
 
-      track.enabled =
+    track.enabled =
+      micEnabled;
+
+  });
+
+
+  if (currentCall) {
+
+    const sender =
+      currentCall.peerConnection
+      .getSenders()
+      .find(function(sender) {
+
+        return sender.track &&
+               sender.track.kind === "audio";
+
+      });
+
+
+    if (sender && sender.track) {
+
+      sender.track.enabled =
         micEnabled;
 
     }
-  );
+
+  }
 
 
-  document.getElementById(
-    "micBtn"
-  ).textContent =
+  document.getElementById("micBtn").textContent =
     micEnabled
     ? "🎙️ Mic ON"
     : "🔇 Mic OFF";
@@ -733,7 +827,7 @@ function toggleMic() {
 
 
 /* =========================
-   KAMERA ON/OFF
+   KAMERA OWNER ON / OFF
 ========================= */
 
 function toggleCamera() {
@@ -753,6 +847,7 @@ function toggleCamera() {
     );
 
     return;
+
   }
 
 
@@ -760,19 +855,38 @@ function toggleCamera() {
     !cameraEnabled;
 
 
-  tracks.forEach(
-    function(track) {
+  tracks.forEach(function(track) {
 
-      track.enabled =
+    track.enabled =
+      cameraEnabled;
+
+  });
+
+
+  if (currentCall) {
+
+    const sender =
+      currentCall.peerConnection
+      .getSenders()
+      .find(function(sender) {
+
+        return sender.track &&
+               sender.track.kind === "video";
+
+      });
+
+
+    if (sender && sender.track) {
+
+      sender.track.enabled =
         cameraEnabled;
 
     }
-  );
+
+  }
 
 
-  document.getElementById(
-    "videoBtn"
-  ).textContent =
+  document.getElementById("videoBtn").textContent =
     cameraEnabled
     ? "📹 Kamera ON"
     : "🚫 Kamera OFF";
@@ -781,7 +895,7 @@ function toggleCamera() {
 
 
 /* =========================
-   CHAT
+   CHAT OWNER
 ========================= */
 
 function sendMessage() {
@@ -808,6 +922,7 @@ function sendMessage() {
     dataConnection.send({
 
       type: "message",
+
       text: text
 
     });
@@ -872,7 +987,7 @@ function addMessage(
 
 
 /* =========================
-   AKHIRI
+   AKHIRI PANGGILAN
 ========================= */
 
 function endCall(
@@ -893,23 +1008,6 @@ function endCall(
   }
 
 
-  if (localStream) {
-
-    localStream
-      .getTracks()
-      .forEach(
-        function(track) {
-
-          track.stop();
-
-        }
-      );
-
-    localStream = null;
-
-  }
-
-
   if (dataConnection) {
 
     try {
@@ -923,9 +1021,25 @@ function endCall(
   }
 
 
+  if (localStream) {
+
+    localStream
+    .getTracks()
+    .forEach(function(track) {
+
+      track.stop();
+
+    });
+
+    localStream = null;
+
+  }
+
+
   currentCall = null;
   incomingCall = null;
   currentVideoTrack = null;
+  currentCameraId = null;
 
 
   remoteVideo.srcObject =
@@ -933,6 +1047,13 @@ function endCall(
 
   localVideo.srcObject =
     null;
+
+
+  remoteVideo.style.transform =
+    "scaleX(1)";
+
+  localVideo.style.transform =
+    "scaleX(1)";
 
 
   callArea.style.display =
@@ -949,16 +1070,64 @@ function endCall(
     "";
 
 
+  mirrored = false;
   micEnabled = true;
   cameraEnabled = true;
-  mirrored = false;
-  usingFrontCamera = true;
 
 
-  localVideo.style.transform =
-    "scaleX(1)";
+  document.getElementById("micBtn").textContent =
+    "🎙️ Mic ON";
+
+  document.getElementById("videoBtn").textContent =
+    "📹 Kamera ON";
+
+  document.getElementById("mirrorBtn").textContent =
+    "↔️ Balik Layar";
 
 }
+
+
+document.getElementById("rejectBtn").onclick =
+function() {
+
+  if (incomingCall) {
+
+    incomingCall.close();
+
+  }
+
+  incomingCall = null;
+
+  incoming.style.display =
+    "none";
+
+  status.textContent =
+    "🟢 Owner online — menunggu panggilan";
+
+};
+
+
+peer.on("error", function(error) {
+
+  console.error(
+    "PeerJS Error:",
+    error
+  );
+
+  status.textContent =
+    "❌ PeerJS: " + error.type;
+
+});
+
+
+peer.on("disconnected", function() {
+
+  status.textContent =
+    "🟠 Server terputus...";
+
+  peer.reconnect();
+
+});
 
 </script>
 
