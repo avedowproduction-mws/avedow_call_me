@@ -4,24 +4,38 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Home Call</title>
+
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   font-family:Arial,sans-serif;
   background:#0b0f14;
   color:white;
 }
+
 .header{
   padding:20px;
   text-align:center;
   background:#111821;
-  border-bottom:1px solid #222b35;
+  border-bottom:1px solid #252e38;
 }
-.header h1{margin:0;font-size:25px}
-.status{margin-top:7px;color:#35e27b;font-size:14px}
+
+.header h1{
+  margin:0;
+  font-size:25px;
+}
+
+.status{
+  margin-top:7px;
+  color:#35e27b;
+  font-size:14px;
+}
 
 .container{
   max-width:480px;
@@ -29,9 +43,18 @@ body{
   padding:20px;
 }
 
-.welcome{text-align:center;margin:25px 0}
-.welcome h2{margin-bottom:8px}
-.welcome p{color:#aeb7c2}
+.welcome{
+  text-align:center;
+  margin:25px 0;
+}
+
+.welcome h2{
+  margin-bottom:8px;
+}
+
+.welcome p{
+  color:#aeb7c2;
+}
 
 .card{
   background:#151c25;
@@ -41,28 +64,26 @@ body{
   box-shadow:0 8px 30px #0005;
 }
 
-.callIcon{font-size:55px;margin-bottom:10px}
-
-button{
-  border:0;
-  border-radius:13px;
-  padding:13px 16px;
-  color:white;
-  background:#26313e;
-  font-size:15px;
-  cursor:pointer;
+.callIcon{
+  font-size:55px;
 }
-button:active{transform:scale(.97)}
 
 .start{
   width:100%;
   margin-top:15px;
   background:#18a957;
+  color:white;
+  border:0;
+  border-radius:13px;
+  padding:14px;
   font-size:17px;
   font-weight:bold;
 }
 
-#callArea{display:none;margin-top:20px}
+#callArea{
+  display:none;
+  margin-top:20px;
+}
 
 .videoBox{
   position:relative;
@@ -84,7 +105,7 @@ button:active{transform:scale(.97)}
   position:absolute;
   right:12px;
   bottom:12px;
-  width:110px;
+  width:105px;
   aspect-ratio:3/4;
   border-radius:12px;
   overflow:hidden;
@@ -100,32 +121,49 @@ button:active{transform:scale(.97)}
 
 .controls{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:8px;
   margin-top:15px;
 }
 
-.end{background:#d83232}
+.controlBtn{
+  border:0;
+  border-radius:13px;
+  padding:13px 5px;
+  color:white;
+  background:#26313e;
+  font-size:14px;
+}
+
+.end{
+  background:#d83232;
+}
 
 .chat{
-  margin-top:20px;
+  margin-top:15px;
   background:#151c25;
-  border-radius:18px;
-  padding:15px;
+  border-radius:15px;
+  padding:12px;
+}
+
+.chatTitle{
+  font-size:15px;
+  margin-bottom:8px;
 }
 
 .messages{
-  height:180px;
+  height:125px;
   overflow-y:auto;
-  margin-bottom:10px;
+  margin-bottom:8px;
 }
 
 .msg{
   background:#26313e;
-  padding:9px 11px;
-  border-radius:10px;
-  margin-bottom:7px;
+  padding:7px 9px;
+  border-radius:9px;
+  margin-bottom:6px;
   max-width:85%;
+  font-size:13px;
 }
 
 .mine{
@@ -133,19 +171,52 @@ button:active{transform:scale(.97)}
   background:#168a4a;
 }
 
+.msgName{
+  font-size:10px;
+  opacity:.7;
+  margin-bottom:3px;
+}
+
 .chatRow{
   display:flex;
-  gap:7px;
+  gap:5px;
 }
 
 .chatRow input{
+  min-width:0;
   flex:1;
   border:0;
   outline:0;
-  border-radius:10px;
-  padding:12px;
+  border-radius:9px;
+  padding:9px;
   background:#222b35;
   color:white;
+  font-size:13px;
+}
+
+.sendBtn,
+.emojiBtn{
+  border:0;
+  border-radius:9px;
+  background:#26313e;
+  color:white;
+  padding:8px 10px;
+}
+
+.emojiPanel{
+  display:none;
+  background:#202934;
+  border-radius:10px;
+  padding:7px;
+  margin-bottom:7px;
+  text-align:center;
+  line-height:1.8;
+}
+
+.emojiPanel span{
+  cursor:pointer;
+  font-size:20px;
+  margin:2px;
 }
 </style>
 </head>
@@ -167,81 +238,124 @@ button:active{transform:scale(.97)}
   <div class="card" id="startCard">
     <div class="callIcon">📹</div>
     <h2>Video Call</h2>
-    <p>Tekan tombol di bawah untuk menghubungi pemilik rumah.</p>
-    <button class="start" onclick="startCall()">📞 Mulai Video Call</button>
+    <p>Tekan tombol di bawah untuk menghubungi Avedo.</p>
+
+    <button class="start" onclick="startCall()">
+      📞 Mulai Video Call
+    </button>
   </div>
 
   <div id="callArea">
 
     <div class="videoBox">
+
       <video id="remoteVideo" autoplay playsinline></video>
 
       <div class="localBox">
         <video id="localVideo" autoplay muted playsinline></video>
       </div>
+
     </div>
 
     <div class="controls">
-      <button onclick="toggleMirror()">↔️</button>
-      <button onclick="toggleMic()" id="micBtn">🎙️</button>
-      <button onclick="toggleCamera()" id="camBtn">📹</button>
-      <button class="end" onclick="endCall()">🔴</button>
+
+      <button class="controlBtn" onclick="toggleMirror()">
+        ↔️ Balik Layar
+      </button>
+
+      <button class="controlBtn" onclick="toggleCamera()" id="camBtn">
+        📹 Kamera
+      </button>
+
+      <button class="controlBtn end" onclick="endCall()">
+        🔴 Akhiri
+      </button>
+
     </div>
 
     <div class="chat">
-      <h3>💬 Pesan</h3>
+
+      <div class="chatTitle">💬 Pesan</div>
 
       <div class="messages" id="messages"></div>
 
-      <div class="chatRow">
-        <input id="messageInput" placeholder="Ketik pesan...">
-        <button onclick="sendMessage()">Kirim</button>
+      <div class="emojiPanel" id="emojiPanel">
+        <span onclick="addEmoji('😀')">😀</span>
+        <span onclick="addEmoji('😂')">😂</span>
+        <span onclick="addEmoji('😊')">😊</span>
+        <span onclick="addEmoji('😍')">😍</span>
+        <span onclick="addEmoji('👍')">👍</span>
+        <span onclick="addEmoji('❤️')">❤️</span>
+        <span onclick="addEmoji('🙏')">🙏</span>
+        <span onclick="addEmoji('😎')">😎</span>
+        <span onclick="addEmoji('😁')">😁</span>
+        <span onclick="addEmoji('🎉')">🎉</span>
+        <span onclick="addEmoji('👋')">👋</span>
+        <span onclick="addEmoji('🏠')">🏠</span>
       </div>
+
+      <div class="chatRow">
+
+        <button class="emojiBtn" onclick="toggleEmoji()">
+          😀
+        </button>
+
+        <input
+          id="messageInput"
+          placeholder="Pesan..."
+          onkeydown="if(event.key==='Enter')sendMessage()"
+        >
+
+        <button class="sendBtn" onclick="sendMessage()">
+          ➤
+        </button>
+
+      </div>
+
     </div>
 
   </div>
+
 </div>
 
 <script>
-const OWNER_ID = "homecall-owner-2026";
 
-const peer = new Peer();
+const OWNER_ID="homecall-owner-2026";
 
-let currentCall = null;
-let dataConnection = null;
+const peer=new Peer();
 
-let localStream = null;
-let audioTrack = null;
-let videoTrack = null;
-let audioSender = null;
+let currentCall=null;
+let dataConnection=null;
 
-let micOn = true;
-let cameraOn = true;
-let mirrored = false;
+let localStream=null;
+let videoTrack=null;
 
-const statusEl = document.getElementById("status");
-const localVideo = document.getElementById("localVideo");
-const remoteVideo = document.getElementById("remoteVideo");
+let cameraOn=true;
+let mirrored=false;
 
-peer.on("open", () => {
-  statusEl.textContent = "🟢 Online";
+const localVideo=document.getElementById("localVideo");
+const remoteVideo=document.getElementById("remoteVideo");
+const statusEl=document.getElementById("status");
+
+peer.on("open",()=>{
+  statusEl.textContent="🟢 Online";
 });
 
-peer.on("error", err => {
+peer.on("error",err=>{
   console.log(err);
-  statusEl.textContent = "🔴 Terjadi masalah";
+  statusEl.textContent="🔴 Terjadi masalah";
 });
 
 async function getMedia(){
-  localStream = await navigator.mediaDevices.getUserMedia({
+
+  localStream=await navigator.mediaDevices.getUserMedia({
     video:true,
-    audio:true
+    audio:false
   });
 
-  audioTrack = localStream.getAudioTracks()[0];
-  videoTrack = localStream.getVideoTracks()[0];
+  videoTrack=localStream.getVideoTracks()[0];
 
-  localVideo.srcObject = localStream;
+  localVideo.srcObject=localStream;
 }
 
 async function startCall(){
@@ -253,25 +367,14 @@ async function startCall(){
     document.getElementById("startCard").style.display="none";
     document.getElementById("callArea").style.display="block";
 
-    dataConnection = peer.connect(OWNER_ID);
-
-    dataConnection.on("open",()=>{
-      console.log("Data connection connected");
-    });
+    dataConnection=peer.connect(OWNER_ID);
 
     dataConnection.on("data",handleData);
 
-    currentCall = peer.call(OWNER_ID,localStream);
+    currentCall=peer.call(OWNER_ID,localStream);
 
     currentCall.on("stream",stream=>{
       remoteVideo.srcObject=stream;
-
-      setTimeout(()=>{
-        audioSender =
-          currentCall.peerConnection
-          .getSenders()
-          .find(s => s.track && s.track.kind==="audio");
-      },500);
     });
 
     currentCall.on("close",()=>{
@@ -279,8 +382,11 @@ async function startCall(){
     });
 
   }catch(e){
-    alert("Tidak dapat menggunakan kamera atau mikrofon.");
+
     console.log(e);
+
+    alert("Kamera tidak dapat digunakan.");
+
   }
 }
 
@@ -288,62 +394,60 @@ function toggleMirror(){
 
   mirrored=!mirrored;
 
-  localVideo.style.transform =
+  localVideo.style.transform=
     mirrored ? "scaleX(-1)" : "scaleX(1)";
 
   if(dataConnection && dataConnection.open){
+
     dataConnection.send({
       type:"mirror",
       value:mirrored
     });
+
   }
-}
-
-function toggleMic(){
-
-  micOn=!micOn;
-
-  if(audioSender){
-
-    if(micOn){
-      audioSender.replaceTrack(audioTrack);
-    }else{
-      audioSender.replaceTrack(null);
-    }
-  }
-
-  audioTrack.enabled=micOn;
-
-  document.getElementById("micBtn").textContent =
-    micOn ? "🎙️" : "🔇";
 }
 
 function toggleCamera(){
 
   cameraOn=!cameraOn;
 
-  videoTrack.enabled=cameraOn;
+  if(videoTrack){
+    videoTrack.enabled=cameraOn;
+  }
 
-  document.getElementById("camBtn").textContent =
-    cameraOn ? "📹" : "🚫📹";
+  document.getElementById("camBtn").textContent=
+    cameraOn ? "📹 Kamera" : "🚫 Kamera";
 }
 
 function endCall(sendMessage=true){
 
-  if(sendMessage && dataConnection && dataConnection.open){
+  if(
+    sendMessage &&
+    dataConnection &&
+    dataConnection.open
+  ){
+
     dataConnection.send({
       type:"peer-ended"
     });
+
   }
 
   if(currentCall){
+
     currentCall.close();
     currentCall=null;
+
   }
 
   if(localStream){
-    localStream.getTracks().forEach(track=>track.stop());
+
+    localStream.getTracks().forEach(track=>{
+      track.stop();
+    });
+
     localStream=null;
+
   }
 
   remoteVideo.srcObject=null;
@@ -352,12 +456,29 @@ function endCall(sendMessage=true){
   document.getElementById("callArea").style.display="none";
   document.getElementById("startCard").style.display="block";
 
-  micOn=true;
   cameraOn=true;
   mirrored=false;
 
-  document.getElementById("micBtn").textContent="🎙️";
-  document.getElementById("camBtn").textContent="📹";
+  document.getElementById("camBtn").textContent="📹 Kamera";
+}
+
+function toggleEmoji(){
+
+  const panel=document.getElementById("emojiPanel");
+
+  panel.style.display=
+    panel.style.display==="block"
+    ? "none"
+    : "block";
+}
+
+function addEmoji(emoji){
+
+  const input=document.getElementById("messageInput");
+
+  input.value+=emoji;
+  input.focus();
+
 }
 
 function sendMessage(){
@@ -374,39 +495,62 @@ function sendMessage(){
       message:text
     });
 
-    addMessage(text,true);
+    addMessage("Penelepon",text,true);
+
     input.value="";
   }
 }
 
-function addMessage(text,mine){
+function addMessage(name,text,mine){
 
   const box=document.getElementById("messages");
 
   const div=document.createElement("div");
+
   div.className="msg"+(mine ? " mine":"");
-  div.textContent=text;
+
+  div.innerHTML=
+    '<div class="msgName">'+
+    escapeHtml(name)+
+    '</div>'+
+    escapeHtml(text);
 
   box.appendChild(div);
+
   box.scrollTop=box.scrollHeight;
+}
+
+function escapeHtml(text){
+
+  const div=document.createElement("div");
+  div.textContent=text;
+
+  return div.innerHTML;
 }
 
 function handleData(data){
 
   if(data.type==="chat"){
-    addMessage(data.message,false);
+
+    addMessage("Avedo",data.message,false);
+
   }
 
   if(data.type==="mirror"){
 
-    remoteVideo.style.transform =
+    remoteVideo.style.transform=
       data.value ? "scaleX(-1)" : "scaleX(1)";
+
   }
 
   if(data.type==="peer-ended"){
+
     endCall(false);
+
   }
+
 }
+
 </script>
 
 </body>
