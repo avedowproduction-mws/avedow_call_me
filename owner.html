@@ -3,252 +3,334 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Home Call - Owner</title>
 
 <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
 
 body{
-    margin:0;
-    background:#080b12;
-    color:white;
-    font-family:Arial,Helvetica,sans-serif;
+  font-family:Arial, sans-serif;
+  background:#080b12;
+  color:white;
+  min-height:100vh;
 }
 
 .app{
-    width:100%;
-    max-width:500px;
-    margin:auto;
-    padding:18px;
+  width:100%;
+  max-width:500px;
+  margin:auto;
+  padding:18px;
 }
 
+/* TOP */
 .top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
 }
 
 .logo{
-    font-size:24px;
-    font-weight:bold;
+  font-size:21px;
+  font-weight:bold;
 }
 
 .online{
-    background:#102b1b;
-    color:#42e27b;
-    padding:8px 12px;
-    border-radius:20px;
-    font-size:13px;
+  background:#102b1b;
+  color:#45e878;
+  padding:8px 12px;
+  border-radius:20px;
+  font-size:12px;
 }
 
-.card{
-    background:#111722;
-    border:1px solid #202938;
-    border-radius:24px;
-    padding:20px;
-    margin-top:15px;
+/* OWNER CARD */
+.owner-card{
+  background:#111722;
+  border:1px solid #202938;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:18px;
+  text-align:center;
 }
 
-.card h2{
-    margin-top:0;
+.owner-icon{
+  width:70px;
+  height:70px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:20px;
+  background:#080b12;
+  font-size:35px;
+  margin-bottom:15px;
 }
 
-.info{
-    color:#9ea7b7;
-    line-height:1.6;
+.owner-card h2{
+  font-size:21px;
+  margin-bottom:8px;
 }
 
-.notifyBtn{
-    width:100%;
-    padding:14px;
-    border:0;
-    border-radius:14px;
-    background:#1677ff;
-    color:white;
-    font-weight:bold;
-    margin-top:12px;
-    cursor:pointer;
+.server-text{
+  color:#9aa5b5;
+  font-size:14px;
+  line-height:1.5;
 }
 
+/* NOTIFICATION */
+.notify-btn{
+  width:100%;
+  border:none;
+  border-radius:13px;
+  padding:13px;
+  margin-top:17px;
+  background:#1d2635;
+  color:white;
+  font-size:14px;
+  cursor:pointer;
+}
+
+.notify-btn:active{
+  transform:scale(.98);
+}
+
+/* INCOMING */
 .incoming{
-    display:none;
-    background:#182235;
-    border:1px solid #2c3c56;
-    border-radius:20px;
-    padding:18px;
-    margin-top:15px;
-    text-align:center;
+  display:none;
+  background:#152238;
+  border:1px solid #31527d;
+  border-radius:20px;
+  padding:20px;
+  margin-bottom:18px;
+  text-align:center;
 }
 
-.incomingIcon{
-    font-size:50px;
+.incoming h3{
+  margin-bottom:8px;
+}
+
+.incoming p{
+  color:#aab5c5;
+  font-size:14px;
+  margin-bottom:17px;
+}
+
+.incoming-buttons{
+  display:flex;
+  gap:10px;
 }
 
 .accept,
 .reject{
-    width:100%;
-    border:0;
-    padding:14px;
-    border-radius:14px;
-    margin-top:10px;
-    color:white;
-    font-weight:bold;
-    cursor:pointer;
+  flex:1;
+  border:0;
+  border-radius:12px;
+  padding:13px;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 .accept{
-    background:#19a85b;
+  background:#20a95a;
 }
 
 .reject{
-    background:#ef3340;
+  background:#d83242;
 }
 
-#callScreen{
-    display:none;
+/* CALL */
+.call-screen{
+  display:none;
 }
 
-.videoBox{
-    position:relative;
-    width:100%;
-    background:#000;
-    border-radius:20px;
-    overflow:hidden;
-    aspect-ratio:9/16;
-    max-height:70vh;
+.call-card{
+  background:#111722;
+  border:1px solid #202938;
+  border-radius:20px;
+  padding:15px;
 }
 
-#remoteVideo{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.call-title{
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:14px;
 }
 
-#localVideo{
-    position:absolute;
-    width:105px;
-    height:150px;
-    right:12px;
-    bottom:12px;
-    object-fit:cover;
-    border-radius:14px;
-    border:2px solid white;
-    background:#111;
+.video-container{
+  position:relative;
+  width:100%;
+  aspect-ratio:9/16;
+  max-height:600px;
+  background:#000;
+  border-radius:17px;
+  overflow:hidden;
 }
 
-.remoteStatus{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    background:rgba(0,0,0,.75);
-    padding:12px 18px;
-    border-radius:14px;
-    display:none;
-    text-align:center;
+.remote-video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+  background:#000;
+  transition:transform .25s ease;
 }
 
+.local-video{
+  position:absolute;
+  right:12px;
+  bottom:12px;
+  width:115px;
+  height:160px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid white;
+  background:#111;
+  z-index:5;
+  transition:transform .25s ease;
+}
+
+.remote-status{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  background:rgba(0,0,0,.72);
+  padding:12px 17px;
+  border-radius:12px;
+  font-size:14px;
+  display:none;
+  z-index:4;
+  text-align:center;
+}
+
+/* CONTROLS */
 .controls{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin-top:14px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:15px;
 }
 
 .control{
-    background:#1a2230;
-    color:white;
-    border:0;
-    border-radius:15px;
-    padding:13px 5px;
-    font-size:13px;
-    font-weight:bold;
-    cursor:pointer;
+  border:0;
+  border-radius:13px;
+  padding:13px 8px;
+  background:#1b2330;
+  color:white;
+  cursor:pointer;
+  font-size:13px;
 }
 
-.control.active{
-    background:#26364d;
+.control.off{
+  background:#7c2630;
 }
 
-.end{
-    width:100%;
-    margin-top:12px;
-    padding:15px;
-    border-radius:15px;
-    background:#ef3340;
-    color:white;
-    font-size:15px;
-    border:0;
-    font-weight:bold;
+.end-call{
+  width:100%;
+  margin-top:12px;
+  border:0;
+  border-radius:13px;
+  padding:14px;
+  background:#d83242;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
 
+/* CHAT */
 .chat{
-    margin-top:15px;
-    background:#111722;
-    border-radius:18px;
-    padding:12px;
+  margin-top:15px;
+  background:#0e141e;
+  border-radius:17px;
+  padding:12px;
 }
 
-.messages{
-    max-height:190px;
-    overflow-y:auto;
+.chat-messages{
+  height:150px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:7px;
+  margin-bottom:10px;
 }
 
-.msg{
-    margin:7px 0;
-    padding:9px 12px;
-    border-radius:13px;
-    max-width:80%;
-    word-wrap:break-word;
+.message{
+  max-width:78%;
+  padding:8px 11px;
+  border-radius:12px;
+  font-size:13px;
+  word-break:break-word;
 }
 
-.mine{
-    background:#1677ff;
-    margin-left:auto;
+.message.me{
+  align-self:flex-end;
+  background:#075e54;
 }
 
-.theirs{
-    background:#252d3b;
+.message.other{
+  align-self:flex-start;
+  background:#202936;
 }
 
-.chatInput{
-    display:flex;
-    gap:6px;
-    margin-top:8px;
+.chat-input-row{
+  display:flex;
+  gap:7px;
 }
 
-.chatInput input{
-    flex:1;
-    min-width:0;
-    padding:12px;
-    border:0;
-    border-radius:12px;
-    background:#202938;
-    color:white;
-    outline:none;
+.emoji-btn,
+.send-btn{
+  border:0;
+  border-radius:10px;
+  background:#202936;
+  color:white;
+  cursor:pointer;
 }
 
-.chatInput button{
-    padding:0 12px;
-    border:0;
-    border-radius:12px;
-    background:#1677ff;
-    color:white;
+.emoji-btn{
+  width:43px;
+}
+
+.chat-input{
+  flex:1;
+  border:0;
+  outline:0;
+  background:#202936;
+  color:white;
+  padding:10px;
+  border-radius:10px;
+}
+
+.send-btn{
+  width:55px;
+  background:#168aad;
+}
+
+.emoji-panel{
+  display:none;
+  padding:8px 0;
+  font-size:22px;
+  line-height:1.8;
 }
 
 .emoji{
-    background:#202938!important;
+  cursor:pointer;
+  margin-right:7px;
 }
 
+/* FOOTER */
 .footer{
-    text-align:center;
-    color:#687181;
-    font-size:12px;
-    margin:25px 0 5px;
+  text-align:center;
+  color:#596575;
+  font-size:12px;
+  margin-top:25px;
+  padding-bottom:15px;
 }
 </style>
 </head>
@@ -257,196 +339,175 @@ body{
 
 <div class="app">
 
-    <div class="top">
+  <div class="top">
+    <div class="logo">Home Call</div>
+    <div class="online" id="onlineStatus">🟡 Menghubungkan...</div>
+  </div>
 
-        <div class="logo">
-            Home Call
+  <div class="owner-card">
+    <div class="owner-icon">🏠</div>
+
+    <h2>Owner</h2>
+
+    <div class="server-text" id="serverText">
+      Menghubungkan ke server...
+    </div>
+
+    <button class="notify-btn" id="notifyBtn">
+      🔔 Aktifkan Notifikasi & Dering
+    </button>
+  </div>
+
+  <!-- PANGGILAN MASUK -->
+  <div class="incoming" id="incomingBox">
+
+    <h3>📞 Panggilan Masuk</h3>
+
+    <p>
+      Seseorang sedang mencoba menghubungi Anda.
+    </p>
+
+    <div class="incoming-buttons">
+
+      <button class="accept" id="acceptBtn">
+        ✅ Terima Panggilan
+      </button>
+
+      <button class="reject" id="rejectBtn">
+        ❌ Tolak
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- VIDEO CALL -->
+  <div class="call-screen" id="callScreen">
+
+    <div class="call-card">
+
+      <div class="call-title">
+        🎥 Video Call
+      </div>
+
+      <div class="video-container">
+
+        <video
+          id="remoteVideo"
+          class="remote-video"
+          autoplay
+          playsinline>
+        </video>
+
+        <video
+          id="localVideo"
+          class="local-video"
+          autoplay
+          muted
+          playsinline>
+        </video>
+
+        <div class="remote-status" id="remoteStatus"></div>
+
+      </div>
+
+      <!-- CONTROLS -->
+      <div class="controls">
+
+        <button
+          class="control"
+          id="micBtn">
+          🎙️ Mic ON
+        </button>
+
+        <button
+          class="control"
+          id="cameraBtn">
+          🎥 Kamera ON
+        </button>
+
+        <button
+          class="control"
+          id="mirrorBtn">
+          🔄 Mirror
+        </button>
+
+      </div>
+
+      <button
+        class="end-call"
+        id="endBtn">
+        🔴 Akhiri Panggilan
+      </button>
+
+      <!-- CHAT -->
+      <div class="chat">
+
+        <div
+          class="chat-messages"
+          id="chatMessages">
         </div>
 
         <div
-            class="online"
-            id="onlineStatus"
-        >
-            🟡 Menghubungkan...
-        </div>
+          class="emoji-panel"
+          id="emojiPanel">
 
-    </div>
-
-
-    <div class="card">
-
-        <h2>🏠 Owner</h2>
-
-        <div
-            class="info"
-            id="serverText"
-        >
-            Menghubungkan ke server...
-        </div>
-
-        <button
-            class="notifyBtn"
-            onclick="enableNotifications()"
-        >
-            🔔 Aktifkan Notifikasi & Dering
-        </button>
-
-    </div>
-
-
-    <div
-        class="incoming"
-        id="incomingBox"
-    >
-
-        <div class="incomingIcon">
-            📞
-        </div>
-
-        <h2>Panggilan Masuk</h2>
-
-        <p>
-            Seseorang sedang mencoba
-            menghubungi Anda.
-        </p>
-
-        <button
-            class="accept"
-            onclick="acceptCall()"
-        >
-            ✅ Terima Panggilan
-        </button>
-
-        <button
-            class="reject"
-            onclick="rejectCall()"
-        >
-            ❌ Tolak
-        </button>
-
-    </div>
-
-
-    <div id="callScreen">
-
-        <div class="card">
-
-            <h2>🎥 Video Call</h2>
-
-            <div class="videoBox">
-
-                <video
-                    id="remoteVideo"
-                    autoplay
-                    playsinline
-                ></video>
-
-                <video
-                    id="localVideo"
-                    autoplay
-                    muted
-                    playsinline
-                ></video>
-
-                <div
-                    class="remoteStatus"
-                    id="remoteStatus"
-                ></div>
-
-            </div>
-
-
-            <div class="controls">
-
-                <button
-                    class="control active"
-                    id="micBtn"
-                    onclick="toggleMic()"
-                >
-                    🎙️ Mic ON
-                </button>
-
-                <button
-                    class="control active"
-                    id="cameraBtn"
-                    onclick="toggleCamera()"
-                >
-                    📹 Kamera ON
-                </button>
-
-                <button
-                    class="control"
-                    id="mirrorBtn"
-                    onclick="toggleMirror()"
-                >
-                    🔄 Mirror
-                </button>
-
-            </div>
-
-
-            <button
-                class="end"
-                onclick="endCall()"
-            >
-                🔴 Akhiri Panggilan
-            </button>
+          <span class="emoji">😀</span>
+          <span class="emoji">😂</span>
+          <span class="emoji">😍</span>
+          <span class="emoji">🥰</span>
+          <span class="emoji">😎</span>
+          <span class="emoji">👍</span>
+          <span class="emoji">❤️</span>
+          <span class="emoji">🔥</span>
+          <span class="emoji">👏</span>
+          <span class="emoji">🙏</span>
 
         </div>
 
+        <div class="chat-input-row">
 
-        <div class="chat">
+          <button
+            class="emoji-btn"
+            id="emojiBtn">
+            😊
+          </button>
 
-            <div
-                class="messages"
-                id="messages"
-            ></div>
+          <input
+            type="text"
+            id="chatInput"
+            class="chat-input"
+            placeholder="Ketik pesan...">
 
-            <div class="chatInput">
-
-                <button
-                    class="emoji"
-                    onclick="addEmoji('😊')"
-                >
-                    😊
-                </button>
-
-                <input
-                    id="chatText"
-                    type="text"
-                    placeholder="Ketik pesan..."
-                    onkeydown="if(event.key==='Enter') sendMessage()"
-                >
-
-                <button onclick="sendMessage()">
-                    ➤
-                </button>
-
-            </div>
+          <button
+            class="send-btn"
+            id="sendBtn">
+            ➤
+          </button>
 
         </div>
 
+      </div>
+
     </div>
 
+  </div>
 
-    <div class="footer">
-        Home Call • Video Communication
-    </div>
+  <div class="footer">
+    Home Call • Video Communication
+  </div>
 
 </div>
 
 
 <script>
 
-const OWNER_ID =
-    "homecall-owner-2026";
+const OWNER_ID = "homecall-owner-2026";
 
-let peer;
-
+let peer = null;
 let incomingCall = null;
 let activeCall = null;
 let dataConn = null;
-
 let localStream = null;
 
 let micEnabled = true;
@@ -457,833 +518,898 @@ let ringtoneInterval = null;
 let audioContext = null;
 
 
-// =====================================================
-// PEERJS
-// =====================================================
+/* ELEMENT */
+const onlineStatus = document.getElementById("onlineStatus");
+const serverText = document.getElementById("serverText");
 
-// Tidak lagi menentukan host/path/secure manual.
-// PeerJS akan memakai PeerJS Cloud.
+const incomingBox = document.getElementById("incomingBox");
+const acceptBtn = document.getElementById("acceptBtn");
+const rejectBtn = document.getElementById("rejectBtn");
 
-peer = new Peer(
-    OWNER_ID,
-    {
-        debug:2,
+const callScreen = document.getElementById("callScreen");
 
-        config:{
-            iceServers:[
-                {
-                    urls:"stun:stun.l.google.com:19302"
-                }
-            ]
-        }
-    }
-);
+const remoteVideo = document.getElementById("remoteVideo");
+const localVideo = document.getElementById("localVideo");
+const remoteStatus = document.getElementById("remoteStatus");
+
+const micBtn = document.getElementById("micBtn");
+const cameraBtn = document.getElementById("cameraBtn");
+const mirrorBtn = document.getElementById("mirrorBtn");
+
+const endBtn = document.getElementById("endBtn");
+
+const chatMessages = document.getElementById("chatMessages");
+const chatInput = document.getElementById("chatInput");
+const sendBtn = document.getElementById("sendBtn");
+
+const emojiBtn = document.getElementById("emojiBtn");
+const emojiPanel = document.getElementById("emojiPanel");
+
+const notifyBtn = document.getElementById("notifyBtn");
 
 
-peer.on("open", function(id){
+/* STATUS */
+function setStatus(status, text){
 
-    console.log(
-        "OWNER ONLINE:",
-        id
+  onlineStatus.textContent = status;
+  serverText.textContent = text;
+
+}
+
+
+/* CEK PEERJS */
+if(typeof Peer === "undefined"){
+
+  setStatus(
+    "🔴 Error",
+    "PeerJS gagal dimuat. Periksa koneksi internet."
+  );
+
+}
+
+
+/* BUAT PEER */
+function createPeer(){
+
+  if(typeof Peer === "undefined"){
+    return;
+  }
+
+  setStatus(
+    "🟡 Menghubungkan...",
+    "Sedang menghubungkan Owner ke server..."
+  );
+
+  try{
+
+    /*
+      Sengaja memakai PeerJS Cloud default.
+
+      Tidak memakai host/path/key tambahan.
+    */
+
+    peer = new Peer(OWNER_ID);
+
+  }catch(error){
+
+    console.error(error);
+
+    setStatus(
+      "🔴 Error",
+      "Gagal membuat koneksi PeerJS."
     );
 
-    document.getElementById(
-        "onlineStatus"
-    ).textContent =
-        "🟢 Owner Online";
+    return;
 
-    document.getElementById(
-        "serverText"
-    ).textContent =
-        "Terhubung ke server. Siap menerima panggilan.";
-
-});
+  }
 
 
-peer.on("disconnected", function(){
+  /* SERVER TERHUBUNG */
+  peer.on("open", function(id){
 
-    document.getElementById(
-        "onlineStatus"
-    ).textContent =
-        "🟠 Terputus";
+    console.log("Owner online:", id);
 
-    document.getElementById(
-        "serverText"
-    ).textContent =
-        "Koneksi terputus. Mencoba menghubungkan kembali...";
+    setStatus(
+      "🟢 Owner Online",
+      "Terhubung. Owner siap menerima panggilan."
+    );
+
+  });
+
+
+  /* TERPUTUS */
+  peer.on("disconnected", function(){
+
+    console.log("Peer disconnected");
+
+    setStatus(
+      "🟠 Terputus",
+      "Koneksi terputus. Mencoba menghubungkan kembali..."
+    );
 
     setTimeout(function(){
 
-        if(peer.disconnected){
-
-            peer.reconnect();
-
-        }
-
-    },1500);
-
-});
-
-
-peer.on("error", function(err){
-
-    console.error(
-        "PeerJS ERROR:",
-        err
-    );
-
-    document.getElementById(
-        "onlineStatus"
-    ).textContent =
-        "🔴 Error";
-
-    let text =
-        "Gagal terhubung ke server.";
-
-    if(err.type === "unavailable-id"){
-
-        text =
-            "ID Owner sedang digunakan. Tutup halaman Owner lain.";
-
-    }
-
-    else if(err.type === "network"){
-
-        text =
-            "Jaringan bermasalah.";
-
-    }
-
-    else if(err.type === "server-error"){
-
-        text =
-            "Server PeerJS tidak dapat dihubungi.";
-
-    }
-
-    document.getElementById(
-        "serverText"
-    ).textContent =
-        text;
-
-});
-
-
-peer.on("close", function(){
-
-    document.getElementById(
-        "onlineStatus"
-    ).textContent =
-        "🔴 Offline";
-
-});
-
-
-// =====================================================
-// DATA CONNECTION
-// =====================================================
-
-peer.on(
-    "connection",
-    function(conn){
-
-        console.log(
-            "Data connection masuk"
-        );
-
-        dataConn = conn;
-
-        setupDataConnection(conn);
-
-    }
-);
-
-
-function setupDataConnection(conn){
-
-    conn.on("open", function(){
-
-        console.log(
-            "Data channel OWNER terbuka"
-        );
-
-        sendState();
-
-    });
-
-
-    conn.on("data", function(data){
-
-        if(!data) return;
-
-
-        if(data.type === "chat"){
-
-            addMessage(
-                data.text,
-                false
-            );
-
-        }
-
-
-        if(data.type === "mic"){
-
-            showRemoteStatus(
-                data.enabled
-                ? ""
-                : "🎙️ Mikrofon dimatikan"
-            );
-
-        }
-
-
-        if(data.type === "camera"){
-
-            showRemoteStatus(
-                data.enabled
-                ? ""
-                : "📷 Kamera dimatikan"
-            );
-
-        }
-
-
-        if(data.type === "mirror"){
-
-            document.getElementById(
-                "remoteVideo"
-            ).style.transform =
-                data.enabled
-                ? "scaleX(-1)"
-                : "scaleX(1)";
-
-        }
-
-    });
-
-
-    conn.on("close", function(){
-
-        console.log(
-            "Data connection ditutup"
-        );
-
-    });
-
-}
-
-
-// =====================================================
-// PANGGILAN MASUK
-// =====================================================
-
-peer.on(
-    "call",
-    function(call){
-
-        console.log(
-            "Panggilan masuk:",
-            call.peer
-        );
-
-        incomingCall = call;
-
-        document.getElementById(
-            "incomingBox"
-        ).style.display =
-            "block";
-
-        startRingtone();
-
-        showNotification();
-
-    }
-);
-
-
-// =====================================================
-// TERIMA
-// =====================================================
-
-async function acceptCall(){
-
-    if(!incomingCall) return;
-
-    stopRingtone();
-
-    document.getElementById(
-        "incomingBox"
-    ).style.display =
-        "none";
-
-    try{
-
-        localStream =
-            await navigator.mediaDevices.getUserMedia({
-                video:true,
-                audio:true
-            });
-
-        document.getElementById(
-            "localVideo"
-        ).srcObject =
-            localStream;
-
-
-        activeCall =
-            incomingCall;
-
-        incomingCall = null;
-
-
-        activeCall.answer(
-            localStream
-        );
-
-
-        activeCall.on(
-            "stream",
-            function(remoteStream){
-
-                document.getElementById(
-                    "remoteVideo"
-                ).srcObject =
-                    remoteStream;
-
-                document.getElementById(
-                    "callScreen"
-                ).style.display =
-                    "block";
-
-            }
-        );
-
-
-        activeCall.on(
-            "close",
-            function(){
-
-                endCall();
-
-            }
-        );
-
-
-        activeCall.on(
-            "error",
-            function(err){
-
-                console.error(err);
-
-                alert(
-                    "Panggilan mengalami masalah."
-                );
-
-                endCall();
-
-            }
-        );
-
-    }
-
-    catch(error){
-
-        console.error(error);
-
-        alert(
-            "Kamera/mikrofon tidak bisa digunakan.\n\n" +
-            "Berikan izin kamera dan mikrofon pada browser."
-        );
-
-        if(activeCall){
-
-            try{
-                activeCall.close();
-            }catch(e){}
-
-        }
-
-    }
-
-}
-
-
-// =====================================================
-// TOLAK
-// =====================================================
-
-function rejectCall(){
-
-    stopRingtone();
-
-    if(incomingCall){
+      if(
+        peer &&
+        peer.disconnected &&
+        !peer.destroyed
+      ){
 
         try{
-            incomingCall.close();
-        }catch(e){}
+          peer.reconnect();
+        }catch(error){
+          console.error(error);
+        }
+
+      }
+
+    },2000);
+
+  });
+
+
+  /* ERROR */
+  peer.on("error", function(error){
+
+    console.error(
+      "PeerJS error:",
+      error.type,
+      error
+    );
+
+
+    if(error.type === "unavailable-id"){
+
+      setStatus(
+        "🔴 ID Dipakai",
+        "ID Owner sedang dipakai tab/browser lain. Tutup Owner yang lain."
+      );
+
+      return;
+    }
+
+
+    if(error.type === "network"){
+
+      setStatus(
+        "🔴 Jaringan",
+        "Koneksi internet bermasalah."
+      );
+
+      return;
+    }
+
+
+    if(error.type === "server-error"){
+
+      setStatus(
+        "🔴 Server",
+        "Server PeerJS mengalami masalah."
+      );
+
+      return;
+    }
+
+
+    if(error.type === "socket-error" ||
+       error.type === "socket-closed"){
+
+      setStatus(
+        "🟠 Koneksi",
+        "Koneksi ke server terputus."
+      );
+
+      return;
+    }
+
+
+    if(error.type === "ssl-unavailable"){
+
+      setStatus(
+        "🔴 SSL",
+        "Koneksi aman tidak tersedia."
+      );
+
+      return;
+    }
+
+
+    setStatus(
+      "🔴 Error",
+      "PeerJS: " + (error.message || error.type)
+    );
+
+  });
+
+
+  /* CONNECTION DITUTUP */
+  peer.on("close", function(){
+
+    setStatus(
+      "🔴 Offline",
+      "Koneksi Owner ditutup."
+    );
+
+  });
+
+
+  /* DATA CONNECTION */
+  peer.on("connection", function(conn){
+
+    console.log("Data connection masuk");
+
+    dataConn = conn;
+
+    setupDataConnection(conn);
+
+  });
+
+
+  /* PANGGILAN MASUK */
+  peer.on("call", function(call){
+
+    console.log("Panggilan masuk");
+
+    if(activeCall || incomingCall){
+
+      try{
+        call.close();
+      }catch(e){}
+
+      return;
+    }
+
+    incomingCall = call;
+
+    incomingBox.style.display = "block";
+
+    startRingtone();
+
+    showNotification();
+
+  });
+
+}
+
+
+/* JALANKAN PEER */
+createPeer();
+
+
+/* DATA CONNECTION */
+function setupDataConnection(conn){
+
+  conn.on("open", function(){
+
+    console.log("Data connection terbuka");
+
+  });
+
+
+  conn.on("data", function(data){
+
+    console.log("Data diterima:", data);
+
+
+    if(!data || !data.type){
+      return;
+    }
+
+
+    /* CHAT */
+    if(data.type === "chat"){
+
+      addMessage(
+        data.text,
+        "other"
+      );
 
     }
+
+
+    /* MIC */
+    if(data.type === "mic"){
+
+      if(data.enabled){
+
+        showRemoteStatus(
+          "🎙️ Mikrofon menyala",
+          1200
+        );
+
+      }else{
+
+        showRemoteStatus(
+          "🔇 Mikrofon dimatikan",
+          2500
+        );
+
+      }
+
+    }
+
+
+    /* CAMERA */
+    if(data.type === "camera"){
+
+      if(data.enabled){
+
+        showRemoteStatus(
+          "🎥 Kamera menyala",
+          1200
+        );
+
+      }else{
+
+        showRemoteStatus(
+          "📷 Kamera dimatikan",
+          2500
+        );
+
+      }
+
+    }
+
+
+    /* MIRROR */
+    if(data.type === "mirror"){
+
+      remoteVideo.style.transform =
+        data.enabled
+          ? "scaleX(-1)"
+          : "scaleX(1)";
+
+    }
+
+  });
+
+
+  conn.on("close", function(){
+
+    if(dataConn === conn){
+
+      dataConn = null;
+
+    }
+
+  });
+
+
+  conn.on("error", function(error){
+
+    console.error(
+      "Data connection error:",
+      error
+    );
+
+  });
+
+}
+
+
+/* MINTA MEDIA */
+async function getLocalMedia(){
+
+  if(localStream){
+    return localStream;
+  }
+
+  try{
+
+    localStream =
+      await navigator.mediaDevices.getUserMedia({
+
+        video:true,
+        audio:true
+
+      });
+
+    localVideo.srcObject = localStream;
+
+    return localStream;
+
+  }catch(error){
+
+    console.error(error);
+
+    alert(
+      "Kamera dan mikrofon tidak bisa digunakan.\n\n" +
+      "Pastikan izin kamera dan mikrofon sudah diberikan."
+    );
+
+    throw error;
+
+  }
+
+}
+
+
+/* TERIMA PANGGILAN */
+acceptBtn.onclick = async function(){
+
+  if(!incomingCall){
+    return;
+  }
+
+  stopRingtone();
+
+  try{
+
+    const stream =
+      await getLocalMedia();
+
+    incomingCall.answer(stream);
+
+    activeCall = incomingCall;
 
     incomingCall = null;
 
-    document.getElementById(
-        "incomingBox"
-    ).style.display =
-        "none";
+    incomingBox.style.display = "none";
 
-}
+    callScreen.style.display = "block";
 
 
-// =====================================================
-// MIC
-// =====================================================
+    activeCall.on("stream", function(remoteStream){
 
-function toggleMic(){
+      remoteVideo.srcObject = remoteStream;
 
-    if(!localStream) return;
+      remoteVideo.play().catch(()=>{});
 
-    const track =
-        localStream.getAudioTracks()[0];
-
-    if(!track) return;
-
-    micEnabled =
-        !micEnabled;
-
-    track.enabled =
-        micEnabled;
-
-    const btn =
-        document.getElementById(
-            "micBtn"
-        );
-
-    btn.textContent =
-        micEnabled
-        ? "🎙️ Mic ON"
-        : "🔇 Mic OFF";
-
-    btn.classList.toggle(
-        "active",
-        micEnabled
-    );
-
-
-    sendData({
-        type:"mic",
-        enabled:micEnabled
     });
 
-}
 
+    activeCall.on("close", function(){
 
-// =====================================================
-// CAMERA
-// =====================================================
+      endCall(false);
 
-function toggleCamera(){
-
-    if(!localStream) return;
-
-    const track =
-        localStream.getVideoTracks()[0];
-
-    if(!track) return;
-
-    cameraEnabled =
-        !cameraEnabled;
-
-    track.enabled =
-        cameraEnabled;
-
-    const btn =
-        document.getElementById(
-            "cameraBtn"
-        );
-
-    btn.textContent =
-        cameraEnabled
-        ? "📹 Kamera ON"
-        : "📷 Kamera OFF";
-
-    btn.classList.toggle(
-        "active",
-        cameraEnabled
-    );
-
-
-    sendData({
-        type:"camera",
-        enabled:cameraEnabled
     });
 
-}
 
+    activeCall.on("error", function(error){
 
-// =====================================================
-// MIRROR
-// =====================================================
+      console.error(
+        "Call error:",
+        error
+      );
 
-function toggleMirror(){
+      endCall(false);
 
-    mirrorEnabled =
-        !mirrorEnabled;
-
-    document.getElementById(
-        "localVideo"
-    ).style.transform =
-        mirrorEnabled
-        ? "scaleX(-1)"
-        : "scaleX(1)";
-
-
-    document.getElementById(
-        "mirrorBtn"
-    ).classList.toggle(
-        "active",
-        mirrorEnabled
-    );
-
-
-    sendData({
-        type:"mirror",
-        enabled:mirrorEnabled
     });
 
-}
 
+    updateButtons();
 
-// =====================================================
-// DATA
-// =====================================================
+  }catch(error){
 
-function sendData(data){
-
-    if(
-        dataConn &&
-        dataConn.open
-    ){
-
-        dataConn.send(data);
-
-    }
-
-}
-
-
-function sendState(){
-
-    sendData({
-        type:"mic",
-        enabled:micEnabled
-    });
-
-    sendData({
-        type:"camera",
-        enabled:cameraEnabled
-    });
-
-    sendData({
-        type:"mirror",
-        enabled:mirrorEnabled
-    });
-
-}
-
-
-// =====================================================
-// CHAT
-// =====================================================
-
-function sendMessage(){
-
-    const input =
-        document.getElementById(
-            "chatText"
-        );
-
-    const text =
-        input.value.trim();
-
-    if(!text) return;
-
-    addMessage(
-        text,
-        true
-    );
-
-    sendData({
-        type:"chat",
-        text:text
-    });
-
-    input.value = "";
-
-}
-
-
-function addMessage(
-    text,
-    mine
-){
-
-    const box =
-        document.getElementById(
-            "messages"
-        );
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.className =
-        "msg " +
-        (mine
-        ? "mine"
-        : "theirs");
-
-    div.textContent =
-        text;
-
-    box.appendChild(div);
-
-    box.scrollTop =
-        box.scrollHeight;
-
-}
-
-
-function addEmoji(emoji){
-
-    const input =
-        document.getElementById(
-            "chatText"
-        );
-
-    input.value += emoji;
-
-    input.focus();
-
-}
-
-
-// =====================================================
-// STATUS VIDEO
-// =====================================================
-
-function showRemoteStatus(text){
-
-    const status =
-        document.getElementById(
-            "remoteStatus"
-        );
-
-    if(!text){
-
-        status.style.display =
-            "none";
-
-        return;
-
-    }
-
-    status.textContent =
-        text;
-
-    status.style.display =
-        "block";
-
-}
-
-
-// =====================================================
-// NOTIFIKASI
-// =====================================================
-
-async function enableNotifications(){
+    console.error(error);
 
     try{
 
-        if(
-            "Notification"
-            in window
-        ){
+      incomingCall.close();
 
-            const permission =
-                await Notification.requestPermission();
+    }catch(e){}
 
-            console.log(
-                "Notification:",
-                permission
-            );
+    incomingCall = null;
 
-        }
+    incomingBox.style.display = "none";
 
-        startAudio();
+  }
 
-        alert(
-            "Notifikasi dan dering sudah diaktifkan."
-        );
+};
 
-    }
 
-    catch(error){
+/* TOLAK */
+rejectBtn.onclick = function(){
 
-        console.error(error);
+  stopRingtone();
 
-    }
+  if(incomingCall){
+
+    try{
+      incomingCall.close();
+    }catch(e){}
+
+  }
+
+  incomingCall = null;
+
+  incomingBox.style.display = "none";
+
+};
+
+
+/* MIC */
+micBtn.onclick = function(){
+
+  if(!localStream){
+    return;
+  }
+
+  const track =
+    localStream.getAudioTracks()[0];
+
+  if(!track){
+    return;
+  }
+
+  micEnabled = !micEnabled;
+
+  track.enabled = micEnabled;
+
+  updateButtons();
+
+  sendData({
+
+    type:"mic",
+    enabled:micEnabled
+
+  });
+
+};
+
+
+/* CAMERA */
+cameraBtn.onclick = function(){
+
+  if(!localStream){
+    return;
+  }
+
+  const track =
+    localStream.getVideoTracks()[0];
+
+  if(!track){
+    return;
+  }
+
+  cameraEnabled = !cameraEnabled;
+
+  track.enabled = cameraEnabled;
+
+  updateButtons();
+
+  sendData({
+
+    type:"camera",
+    enabled:cameraEnabled
+
+  });
+
+};
+
+
+/* MIRROR */
+mirrorBtn.onclick = function(){
+
+  mirrorEnabled = !mirrorEnabled;
+
+  localVideo.style.transform =
+    mirrorEnabled
+      ? "scaleX(-1)"
+      : "scaleX(1)";
+
+  updateButtons();
+
+  sendData({
+
+    type:"mirror",
+    enabled:mirrorEnabled
+
+  });
+
+};
+
+
+/* UPDATE BUTTON */
+function updateButtons(){
+
+  micBtn.textContent =
+    micEnabled
+      ? "🎙️ Mic ON"
+      : "🔇 Mic OFF";
+
+  cameraBtn.textContent =
+    cameraEnabled
+      ? "🎥 Kamera ON"
+      : "📷 Kamera OFF";
+
+  mirrorBtn.textContent =
+    mirrorEnabled
+      ? "🔄 Mirror ON"
+      : "🔄 Mirror";
+
+
+  micBtn.classList.toggle(
+    "off",
+    !micEnabled
+  );
+
+  cameraBtn.classList.toggle(
+    "off",
+    !cameraEnabled
+  );
+
+  mirrorBtn.classList.toggle(
+    "off",
+    mirrorEnabled
+  );
 
 }
 
 
+/* KIRIM DATA */
+function sendData(data){
+
+  if(
+    dataConn &&
+    dataConn.open
+  ){
+
+    try{
+
+      dataConn.send(data);
+
+    }catch(error){
+
+      console.error(
+        "Gagal mengirim data:",
+        error
+      );
+
+    }
+
+  }
+
+}
+
+
+/* CHAT */
+function sendMessage(){
+
+  const text =
+    chatInput.value.trim();
+
+  if(!text){
+    return;
+  }
+
+
+  addMessage(
+    text,
+    "me"
+  );
+
+
+  sendData({
+
+    type:"chat",
+    text:text
+
+  });
+
+
+  chatInput.value = "";
+
+}
+
+
+/* ENTER CHAT */
+chatInput.addEventListener(
+  "keydown",
+  function(event){
+
+    if(event.key === "Enter"){
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+/* SEND BUTTON */
+sendBtn.onclick = sendMessage;
+
+
+/* TAMBAH PESAN */
+function addMessage(text, type){
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "message " + type;
+
+  message.textContent = text;
+
+  chatMessages.appendChild(message);
+
+  chatMessages.scrollTop =
+    chatMessages.scrollHeight;
+
+}
+
+
+/* EMOJI */
+emojiBtn.onclick = function(){
+
+  emojiPanel.style.display =
+    emojiPanel.style.display === "block"
+      ? "none"
+      : "block";
+
+};
+
+
+/* PILIH EMOJI */
+document.querySelectorAll(".emoji")
+.forEach(function(el){
+
+  el.onclick = function(){
+
+    chatInput.value +=
+      el.textContent;
+
+    chatInput.focus();
+
+  };
+
+});
+
+
+/* STATUS REMOTE */
+function showRemoteStatus(text, duration){
+
+  remoteStatus.textContent = text;
+
+  remoteStatus.style.display =
+    "block";
+
+
+  clearTimeout(
+    showRemoteStatus.timer
+  );
+
+
+  showRemoteStatus.timer =
+    setTimeout(function(){
+
+      remoteStatus.style.display =
+        "none";
+
+    }, duration);
+
+}
+
+
+/* NOTIFIKASI */
+notifyBtn.onclick = async function(){
+
+  try{
+
+    /* Unlock audio browser */
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
+
+    if(AudioContextClass){
+
+      audioContext =
+        audioContext ||
+        new AudioContextClass();
+
+      if(audioContext.state === "suspended"){
+
+        await audioContext.resume();
+
+      }
+
+    }
+
+
+    /* Permission notification */
+    if("Notification" in window){
+
+      const permission =
+        await Notification.requestPermission();
+
+      if(permission === "granted"){
+
+        notifyBtn.textContent =
+          "✅ Notifikasi Aktif";
+
+      }else{
+
+        notifyBtn.textContent =
+          "⚠️ Notifikasi Ditolak";
+
+      }
+
+    }else{
+
+      notifyBtn.textContent =
+        "⚠️ Browser Tidak Mendukung";
+
+    }
+
+
+    /* Bunyi tes */
+    playBeep();
+
+  }catch(error){
+
+    console.error(error);
+
+  }
+
+};
+
+
+/* NOTIFIKASI PANGGILAN */
 function showNotification(){
 
-    if(
-        "Notification"
-        in window &&
-        Notification.permission === "granted"
-    ){
+  if(
+    "Notification" in window &&
+    Notification.permission === "granted"
+  ){
 
-        try{
+    try{
 
-            new Notification(
-                "Home Call",
-                {
-                    body:
-                    "📞 Ada panggilan video masuk!"
-                }
-            );
-
+      new Notification(
+        "📞 Home Call",
+        {
+          body:"Ada panggilan video masuk.",
+          icon:""
         }
+      );
 
-        catch(error){
+    }catch(error){
 
-            console.log(error);
-
-        }
+      console.error(error);
 
     }
+
+  }
 
 }
 
 
-// =====================================================
-// DERING
-// =====================================================
+/* BUNYI */
+function playBeep(){
 
-function startAudio(){
+  try{
 
-    if(!audioContext){
+    const AudioContextClass =
+      window.AudioContext ||
+      window.webkitAudioContext;
 
-        audioContext =
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
-
+    if(!AudioContextClass){
+      return;
     }
 
-    if(
-        audioContext.state ===
-        "suspended"
-    ){
+    audioContext =
+      audioContext ||
+      new AudioContextClass();
 
-        audioContext.resume();
-
-    }
-
-}
-
-
-function beep(){
-
-    if(!audioContext)
-        return;
-
-    if(
-        audioContext.state ===
-        "suspended"
-    ){
-
-        audioContext.resume();
-
-    }
 
     const oscillator =
-        audioContext.createOscillator();
+      audioContext.createOscillator();
 
     const gain =
-        audioContext.createGain();
+      audioContext.createGain();
+
+
+    oscillator.type = "sine";
 
     oscillator.frequency.value =
-        700;
-
-    oscillator.type =
-        "sine";
+      880;
 
     gain.gain.value =
-        0.08;
+      0.12;
+
 
     oscillator.connect(gain);
-
-    gain.connect(
-        audioContext.destination
-    );
-
-    oscillator.start();
-
-    oscillator.stop(
-        audioContext.currentTime + 0.35
-    );
-
-}
-
-
-function startRingtone(){
-
-    stopRingtone();
-
-    startAudio();
-
-    beep();
-
-    ringtoneInterval =
-        setInterval(
-            beep,
-            1200
-        );
-
-}
-
-
-function stopRingtone(){
-
-    if(ringtoneInterval){
-
-        clearInterval(
-            ringtoneInterval
-        );
-
-        ringtoneInterval =
-            null;
-
-    }
-
-}
-
-
-// =====================================================
-// AKHIRI PANGGILAN
-// =====================================================
-
-function endCall(){
-
-    stopRingtone();
-
-    if(activeCall){
-
-        try{
-            activeCall.close();
-        
+    
