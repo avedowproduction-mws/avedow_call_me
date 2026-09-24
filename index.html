@@ -1,728 +1,1330 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Home Call</title>
+<title>Home Call</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.5/dist/peerjs.min.js"></script>
 
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<style>
 
-    body {
-      min-height: 100vh;
-      background: #080b12;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
+* {
+    box-sizing: border-box;
+}
 
-    .app {
-      width: 100%;
-      max-width: 500px;
-      min-height: 100vh;
-      margin: auto;
-      padding: 25px 20px;
-    }
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #080b12;
+    color: white;
+}
 
-    .top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+.app {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    padding: 18px;
+}
 
-    .logo {
-      font-size: 25px;
-      font-weight: bold;
-    }
+/* =========================
+   HEADER
+========================= */
 
-    .status {
-      color: #22c55e;
-      font-size: 13px;
-    }
+.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
 
-    .welcome {
-      margin-top: 70px;
-    }
+.logo {
+    font-size: 21px;
+    font-weight: bold;
+}
 
-    .welcome small {
-      color: #8b93a7;
-      font-size: 15px;
-    }
+.online {
+    color: #19c37d;
+    font-size: 14px;
+}
 
-    .welcome h1 {
-      margin-top: 10px;
-      font-size: 38px;
-      line-height: 1.1;
-    }
+/* =========================
+   WELCOME
+========================= */
 
-    .welcome p {
-      margin-top: 15px;
-      color: #8b93a7;
-      line-height: 1.6;
-    }
+.welcome {
+    text-align: center;
+    padding: 35px 10px 20px;
+}
 
-    .call-card {
-      margin-top: 45px;
-      padding: 25px;
-      background: #111722;
-      border: 1px solid #202938;
-      border-radius: 25px;
-    }
+.welcome h2 {
+    margin-bottom: 8px;
+}
 
-    .icon {
-      height: 180px;
-      background: #080b12;
-      border-radius: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 65px;
-      margin-bottom: 22px;
-    }
+.welcome p {
+    color: #8b9bb4;
+    line-height: 1.5;
+}
 
-    .call-card h2 {
-      font-size: 21px;
-    }
+/* =========================
+   CALL CARD
+========================= */
 
-    .call-card p {
-      color: #7f899d;
-      margin-top: 8px;
-      font-size: 14px;
-      line-height: 1.5;
-    }
+.callCard {
+    background: #111722;
+    border-radius: 22px;
+    padding: 25px;
+    text-align: center;
+    border: 1px solid #202a3b;
+}
 
-    .call-button {
-      width: 100%;
-      padding: 17px;
-      margin-top: 22px;
-      border: none;
-      border-radius: 15px;
-      background: #2563eb;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.cameraIcon {
+    width: 80px;
+    height: 80px;
+    background: #05070b;
+    border-radius: 20px;
 
-    .call-button:active {
-      transform: scale(0.97);
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    .features {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 20px;
-    }
+    margin: auto auto 18px;
 
-    .feature {
-      padding: 15px 8px;
-      text-align: center;
-      background: #111722;
-      border: 1px solid #202938;
-      border-radius: 16px;
-    }
+    font-size: 38px;
+}
 
-    .feature span {
-      font-size: 23px;
-    }
+.callCard p {
+    color: #8b9bb4;
+    line-height: 1.5;
+}
 
-    .feature p {
-      margin-top: 7px;
-      font-size: 11px;
-      color: #8b93a7;
-    }
+.startBtn {
+    width: 100%;
+    margin-top: 12px;
+    padding: 16px;
+    border: 0;
+    border-radius: 14px;
 
-    #callArea {
-      display: none;
-    }
+    background: #2563eb;
+    color: white;
 
-    .video-container {
-      position: relative;
-      width: 100%;
-    }
+    font-size: 17px;
+    font-weight: bold;
+}
 
-    #remoteVideo {
-      width: 100%;
-      height: 330px;
-      object-fit: cover;
-      background: #000;
-      border-radius: 15px;
-      margin-top: 10px;
-    }
+/* =========================
+   FEATURES
+========================= */
 
-    #localVideo {
-      position: absolute;
-      width: 105px;
-      height: 140px;
-      object-fit: cover;
-      right: 12px;
-      bottom: 12px;
-      background: #000;
-      border: 2px solid white;
-      border-radius: 12px;
-      z-index: 2;
-    }
+.features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
 
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px;
-      margin-top: 15px;
-    }
+    margin-top: 15px;
+}
 
-    .control-button {
-      padding: 13px 5px;
-      border: none;
-      border-radius: 13px;
-      background: #202938;
-      color: white;
-      font-size: 13px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.feature {
+    background: #111722;
+    border-radius: 15px;
+    padding: 15px 5px;
 
-    .control-button:active {
-      transform: scale(0.96);
-    }
+    text-align: center;
+}
 
-    .mic-off {
-      background: #7f1d1d;
-    }
+.feature div {
+    font-size: 24px;
+}
 
-    .end-button {
-      width: 100%;
-      padding: 16px;
-      margin-top: 10px;
-      border: none;
-      border-radius: 15px;
-      background: #dc2626;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.feature span {
+    display: block;
+    margin-top: 7px;
+    color: #9aa8bd;
+    font-size: 12px;
+}
 
-    .footer {
-      margin-top: 35px;
-      text-align: center;
-      color: #596275;
-      font-size: 12px;
-    }
-  </style>
+/* =========================
+   CALL AREA
+========================= */
+
+#callArea {
+    display: none;
+}
+
+.videoBox {
+    position: relative;
+    width: 100%;
+    background: black;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+#remoteVideo {
+    display: block;
+
+    width: 100%;
+    height: 65vh;
+    min-height: 350px;
+
+    background: black;
+    object-fit: cover;
+
+    transition: transform .2s;
+}
+
+#localVideo {
+    position: absolute;
+
+    right: 12px;
+    bottom: 12px;
+
+    width: 115px;
+    height: 155px;
+
+    background: #111;
+
+    border: 2px solid white;
+    border-radius: 14px;
+
+    object-fit: cover;
+
+    transition: transform .2s;
+}
+
+/* =========================
+   STATUS
+========================= */
+
+.callStatus {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+
+    margin: 10px 0;
+
+    color: #9aa8bd;
+    font-size: 13px;
+}
+
+.remoteState {
+    display: none;
+
+    position: absolute;
+
+    left: 12px;
+    top: 12px;
+
+    background: rgba(0,0,0,.65);
+
+    padding: 7px 10px;
+
+    border-radius: 10px;
+
+    font-size: 13px;
+}
+
+/* =========================
+   CONTROLS
+========================= */
+
+.controls {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-top: 12px;
+}
+
+.control {
+    border: 0;
+    border-radius: 15px;
+
+    padding: 14px 5px;
+
+    background: #1a2230;
+    color: white;
+
+    font-size: 13px;
+}
+
+.control .icon {
+    display: block;
+    font-size: 22px;
+    margin-bottom: 4px;
+}
+
+.control.active {
+    background: #2563eb;
+}
+
+.control.off {
+    background: #e5484d;
+}
+
+.endBtn {
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 15px;
+
+    border: 0;
+    border-radius: 15px;
+
+    background: #e5484d;
+    color: white;
+
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* =========================
+   CHAT
+========================= */
+
+.chat {
+    display: none;
+
+    margin-top: 12px;
+
+    background: #111722;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+}
+
+.chatHeader {
+    padding: 12px;
+
+    border-bottom: 1px solid #263044;
+
+    font-weight: bold;
+}
+
+.messages {
+    height: 190px;
+
+    overflow-y: auto;
+
+    padding: 12px;
+}
+
+.message {
+    max-width: 78%;
+
+    padding: 9px 12px;
+
+    margin-bottom: 8px;
+
+    border-radius: 14px;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+
+    word-wrap: break-word;
+}
+
+.message.me {
+    margin-left: auto;
+
+    background: #2563eb;
+
+    border-bottom-right-radius: 4px;
+}
+
+.message.other {
+    margin-right: auto;
+
+    background: #263044;
+
+    border-bottom-left-radius: 4px;
+}
+
+.chatInput {
+    display: flex;
+
+    gap: 6px;
+
+    padding: 8px;
+
+    border-top: 1px solid #263044;
+}
+
+.chatInput input {
+    flex: 1;
+
+    min-width: 0;
+
+    border: 0;
+    outline: none;
+
+    background: #1a2230;
+
+    color: white;
+
+    border-radius: 12px;
+
+    padding: 12px;
+}
+
+.chatInput button {
+    width: 44px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 18px;
+}
+
+/* =========================
+   MESSAGE
+========================= */
+
+#message {
+    text-align: center;
+
+    color: #8b9bb4;
+
+    font-size: 13px;
+
+    min-height: 20px;
+
+    margin: 10px;
+}
+
+footer {
+    text-align: center;
+
+    color: #536176;
+
+    font-size: 12px;
+
+    padding: 20px;
+}
+
+</style>
 </head>
 
 <body>
 
 <div class="app">
 
-  <div class="top">
+    <div class="top">
 
-    <div class="logo">
-      Home Call
-    </div>
+        <div class="logo">
+            Home Call
+        </div>
 
-    <div class="status" id="status">
-      🟢 Online
-    </div>
-
-  </div>
-
-  <div id="home">
-
-    <section class="welcome">
-
-      <small>
-        Selamat datang 👋
-      </small>
-
-      <h1>
-        Hubungi<br>
-        saya sekarang.
-      </h1>
-
-      <p>
-        Tekan tombol di bawah untuk
-        memulai panggilan video.
-      </p>
-
-    </section>
-
-    <section class="call-card">
-
-      <div class="icon">
-        📹
-      </div>
-
-      <h2>
-        Video Call
-      </h2>
-
-      <p>
-        Hubungkan kamera dan mikrofon
-        untuk melakukan panggilan video.
-      </p>
-
-      <button
-        class="call-button"
-        onclick="startCall()">
-
-        📞 Mulai Video Call
-
-      </button>
-
-    </section>
-
-    <section class="features">
-
-      <div class="feature">
-        <span>🎥</span>
-        <p>Video</p>
-      </div>
-
-      <div class="feature">
-        <span>🎙️</span>
-        <p>Audio</p>
-      </div>
-
-      <div class="feature">
-        <span>🔒</span>
-        <p>Aman</p>
-      </div>
-
-    </section>
-
-  </div>
-
-  <div class="call-card" id="callArea">
-
-    <h2>
-      🎥 Video Call
-    </h2>
-
-    <div class="video-container">
-
-      <video
-        id="remoteVideo"
-        autoplay
-        playsinline>
-      </video>
-
-      <video
-        id="localVideo"
-        autoplay
-        muted
-        playsinline>
-      </video>
+        <div class="online">
+            🟢 Online
+        </div>
 
     </div>
 
-    <div class="controls">
 
-      <button
-        class="control-button"
-        id="micButton"
-        onclick="toggleMicrophone()">
+    <!-- =========================
+         WELCOME
+    ========================== -->
 
-        🎙️ Mikrofon
+    <div id="welcome">
 
-      </button>
+        <div class="welcome">
 
-      <button
-        class="control-button"
-        id="cameraButton"
-        onclick="toggleCamera()">
+            <h2>
+                Selamat datang 👋
+            </h2>
 
-        📹 Kamera
+            <p>
+                Hubungi saya sekarang.<br>
+                Tekan tombol di bawah untuk memulai panggilan video.
+            </p>
 
-      </button>
+        </div>
 
-      <button
-        class="control-button"
-        onclick="toggleMirror()">
 
-        ↔️ Balik Layar
+        <div class="callCard">
 
-      </button>
+            <div class="cameraIcon">
+                📹
+            </div>
+
+            <h2>
+                Video Call
+            </h2>
+
+            <p>
+                Mulai panggilan video dengan pemilik.
+            </p>
+
+            <button
+                class="startBtn"
+                id="startBtn">
+
+                📞 Mulai Video Call
+
+            </button>
+
+        </div>
+
+
+        <div class="features">
+
+            <div class="feature">
+                <div>🎥</div>
+                <span>Video</span>
+            </div>
+
+            <div class="feature">
+                <div>🎙️</div>
+                <span>Audio</span>
+            </div>
+
+            <div class="feature">
+                <div>🔒</div>
+                <span>Aman</span>
+            </div>
+
+        </div>
 
     </div>
 
-    <button
-      class="end-button"
-      onclick="endCall()">
 
-      🔴 Akhiri Panggilan
+    <!-- =========================
+         CALL
+    ========================== -->
 
-    </button>
+    <div id="callArea">
 
-  </div>
+        <div class="videoBox">
 
-  <div class="footer">
-    Home Call • Video Communication
-  </div>
+            <video
+                id="remoteVideo"
+                autoplay
+                playsinline>
+            </video>
+
+            <video
+                id="localVideo"
+                autoplay
+                muted
+                playsinline>
+            </video>
+
+            <div
+                class="remoteState"
+                id="remoteState">
+            </div>
+
+        </div>
+
+
+        <div class="callStatus">
+
+            <span id="callStatus">
+                Menghubungkan...
+            </span>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div class="controls">
+
+            <button
+                class="control active"
+                id="micBtn">
+
+                <span class="icon">
+                    🎙️
+                </span>
+
+                Mic
+
+            </button>
+
+
+            <button
+                class="control active"
+                id="cameraBtn">
+
+                <span class="icon">
+                    📹
+                </span>
+
+                Kamera
+
+            </button>
+
+
+            <button
+                class="control"
+                id="mirrorBtn">
+
+                <span class="icon">
+                    🔄
+                </span>
+
+                Mirror
+
+            </button>
+
+        </div>
+
+
+        <button
+            class="endBtn"
+            id="endBtn">
+
+            🔴 Akhiri Panggilan
+
+        </button>
+
+
+        <!-- CHAT -->
+
+        <div
+            class="chat"
+            id="chat">
+
+            <div class="chatHeader">
+                💬 Pesan
+            </div>
+
+            <div
+                class="messages"
+                id="messages">
+            </div>
+
+            <div class="chatInput">
+
+                <input
+                    id="chatText"
+                    type="text"
+                    placeholder="Tulis pesan...">
+
+                <button
+                    id="emojiBtn">
+                    😊
+                </button>
+
+                <button
+                    id="sendBtn">
+                    ➤
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div id="message"></div>
+
+    <footer>
+        Home Call • Video Communication
+    </footer>
 
 </div>
 
+
 <script>
 
-  let peer;
-  let currentCall = null;
-  let localStream = null;
+/* =====================================================
+   CONFIG
+===================================================== */
 
-  // Track asli kamera dan mikrofon
-  let audioTrack = null;
-  let videoTrack = null;
+const OWNER_ID =
+    "homecall-owner-2026";
 
-  // Sender mikrofon WebRTC
-  let audioSender = null;
 
-  // Status
-  let microphoneOn = true;
-  let cameraOn = true;
-  let mirrored = false;
+const PEER_OPTIONS = {
 
-  // Membuat ID penelpon otomatis
-  peer = new Peer({
+    host: "0.peerjs.com",
 
-    debug: 3,
+    port: 443,
+
+    path: "/",
+
+    secure: true,
+
+    debug: 2,
 
     config: {
 
-      iceServers: [
-        {
-          urls: "stun:stun.l.google.com:19302"
-        }
-      ]
+        iceServers: [
+
+            {
+                urls:
+                    "stun:stun.l.google.com:19302"
+            }
+
+        ]
 
     }
 
-  });
+};
 
-  peer.on("open", function(id) {
 
-    document.getElementById("status").textContent =
-      "🟢 Online";
+/* =====================================================
+   VARIABLES
+===================================================== */
 
-  });
+let peer = null;
 
-  peer.on("error", function(error) {
+let call = null;
 
-    console.log(error);
+let dataConn = null;
 
-    document.getElementById("status").textContent =
-      "🔴 Koneksi bermasalah";
+let localStream = null;
 
-    alert(
-      "Koneksi gagal: " + error.type
+let audioTrack = null;
+
+let videoTrack = null;
+
+let micOn = true;
+
+let cameraOn = true;
+
+let mirrorOn = false;
+
+
+/* =====================================================
+   ELEMENTS
+===================================================== */
+
+const welcome =
+    document.getElementById("welcome");
+
+const startBtn =
+    document.getElementById("startBtn");
+
+const callArea =
+    document.getElementById("callArea");
+
+const remoteVideo =
+    document.getElementById("remoteVideo");
+
+const localVideo =
+    document.getElementById("localVideo");
+
+const micBtn =
+    document.getElementById("micBtn");
+
+const cameraBtn =
+    document.getElementById("cameraBtn");
+
+const mirrorBtn =
+    document.getElementById("mirrorBtn");
+
+const endBtn =
+    document.getElementById("endBtn");
+
+const callStatus =
+    document.getElementById("callStatus");
+
+const message =
+    document.getElementById("message");
+
+const chat =
+    document.getElementById("chat");
+
+const messages =
+    document.getElementById("messages");
+
+const chatText =
+    document.getElementById("chatText");
+
+const sendBtn =
+    document.getElementById("sendBtn");
+
+const emojiBtn =
+    document.getElementById("emojiBtn");
+
+const remoteState =
+    document.getElementById("remoteState");
+
+
+/* =====================================================
+   CREATE PEER
+===================================================== */
+
+peer =
+    new Peer(
+        undefined,
+        PEER_OPTIONS
     );
 
-  });
 
-  async function startCall() {
+peer.on(
+    "open",
+    function(id) {
 
-    try {
-
-      // Meminta kamera + mikrofon
-      localStream =
-        await navigator.mediaDevices.getUserMedia({
-
-          video: true,
-          audio: true
-
-        });
-
-      // Simpan track kamera
-      videoTrack =
-        localStream.getVideoTracks()[0];
-
-      // Simpan track mikrofon
-      audioTrack =
-        localStream.getAudioTracks()[0];
-
-      // Tampilkan kamera sendiri
-      document.getElementById("localVideo").srcObject =
-        localStream;
-
-      /*
-        ID PEMILIK
-        Harus sama dengan owner.html
-      */
-
-      currentCall =
-        peer.call(
-          "homecall-owner-2026",
-          localStream
+        console.log(
+            "Penelpon online:",
+            id
         );
 
-      document.getElementById("home").style.display =
-        "none";
+    }
+);
 
-      document.getElementById("callArea").style.display =
-        "block";
 
-      document.getElementById("status").textContent =
-        "📞 Memanggil...";
+/* =====================================================
+   START CALL
+===================================================== */
 
-      /*
-        Ambil sender mikrofon dari koneksi WebRTC.
+startBtn.onclick =
+    async function() {
 
-        Kita simpan sender-nya supaya ketika
-        mikrofon dimatikan, kita bisa benar-benar
-        melepas track audio dari pengiriman.
-      */
+        try {
 
-      setTimeout(function() {
+            message.innerText =
+                "Meminta izin kamera dan mikrofon...";
 
-        if (
-          currentCall &&
-          currentCall.peerConnection
-        ) {
 
-          audioSender =
-            currentCall.peerConnection
-              .getSenders()
-              .find(function(sender) {
+            localStream =
+                await navigator.mediaDevices
+                    .getUserMedia({
 
-                return sender.track &&
-                       sender.track.kind === "audio";
+                        video: true,
 
-              });
+                        audio: true
+
+                    });
+
+
+            audioTrack =
+                localStream.getAudioTracks()[0];
+
+            videoTrack =
+                localStream.getVideoTracks()[0];
+
+
+            micOn = true;
+
+            cameraOn = true;
+
+
+            localVideo.srcObject =
+                localStream;
+
+
+            await localVideo
+                .play()
+                .catch(
+                    function() {}
+                );
+
+
+            welcome.style.display =
+                "none";
+
+            callArea.style.display =
+                "block";
+
+            chat.style.display =
+                "block";
+
+
+            callStatus.innerText =
+                "Menghubungkan ke pemilik...";
+
+
+            message.innerText =
+                "";
+
+
+            /* =========================
+               DATA CONNECTION
+            ========================== */
+
+            dataConn =
+                peer.connect(
+                    OWNER_ID,
+                    {
+                        reliable: true
+                    }
+                );
+
+
+            setupDataConnection(
+                dataConn
+            );
+
+
+            /* =========================
+               VIDEO CALL
+            ========================== */
+
+            call =
+                peer.call(
+                    OWNER_ID,
+                    localStream
+                );
+
+
+            call.on(
+                "stream",
+                function(stream) {
+
+                    remoteVideo.srcObject =
+                        stream;
+
+                    remoteVideo
+                        .play()
+                        .catch(
+                            function() {}
+                        );
+
+                    callStatus.innerText =
+                        "🟢 Terhubung";
+
+                }
+            );
+
+
+            call.on(
+                "close",
+                function() {
+
+                    endCall();
+
+                }
+            );
+
+
+            call.on(
+                "error",
+                function(error) {
+
+                    console.error(
+                        error
+                    );
+
+                    callStatus.innerText =
+                        "❌ Panggilan gagal";
+
+                }
+            );
+
+        }
+        catch(error) {
+
+            console.error(
+                error
+            );
+
+            message.innerText =
+                "❌ Kamera/mikrofon tidak bisa digunakan: " +
+                error.message;
 
         }
 
-      }, 500);
+    };
 
-      currentCall.on("stream", function(remoteStream) {
 
-        document.getElementById("remoteVideo").srcObject =
-          remoteStream;
+/* =====================================================
+   DATA CONNECTION
+===================================================== */
 
-        document.getElementById("status").textContent =
-          "🟢 Terhubung";
+function setupDataConnection(conn) {
 
-      });
-
-      currentCall.on("close", function() {
-
-        endCall();
-
-      });
-
-      currentCall.on("error", function(error) {
-
-        console.log(error);
-
-        alert("Panggilan gagal.");
-
-        endCall();
-
-      });
-
-    } catch (error) {
-
-      console.log(error);
-
-      alert(
-        "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
-        error.message
-      );
-
+    if (!conn) {
+        return;
     }
 
-  }
 
-  /*
-    MIKROFON NYATA
+    conn.on(
+        "open",
+        function() {
 
-    ON:
-    Track mikrofon dikirim kembali.
+            console.log(
+                "💬 Data connection terbuka"
+            );
 
-    OFF:
-    Track mikrofon dilepas dari WebRTC
-    menggunakan replaceTrack(null).
-
-    Jadi bukan cuma mengganti gambar tombol.
-  */
-
-  async function toggleMicrophone() {
-
-    if (!audioTrack || !currentCall) {
-      return;
-    }
-
-    try {
-
-      if (microphoneOn) {
-
-        // MATIKAN mikrofon
-        audioTrack.enabled = false;
-
-        if (audioSender) {
-
-          await audioSender.replaceTrack(null);
+            chat.style.display =
+                "block";
 
         }
+    );
 
-        microphoneOn = false;
 
-        document.getElementById("micButton").textContent =
-          "🔇 Mikrofon";
+    conn.on(
+        "data",
+        function(data) {
 
-        document.getElementById("micButton")
-          .classList.add("mic-off");
-
-      } else {
-
-        // NYALAKAN mikrofon
-        audioTrack.enabled = true;
-
-        if (audioSender) {
-
-          await audioSender.replaceTrack(audioTrack);
+            handleData(
+                data
+            );
 
         }
+    );
 
-        microphoneOn = true;
 
-        document.getElementById("micButton").textContent =
-          "🎙️ Mikrofon";
+    conn.on(
+        "close",
+        function() {
 
-        document.getElementById("micButton")
-          .classList.remove("mic-off");
+            console.log(
+                "Data connection ditutup"
+            );
 
-      }
+        }
+    );
 
-    } catch (error) {
 
-      console.log(
-        "Gagal mengubah mikrofon:",
-        error
-      );
+    conn.on(
+        "error",
+        function(error) {
 
-      alert(
-        "Mikrofon tidak dapat diubah."
-      );
+            console.error(
+                "Data error:",
+                error
+            );
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   HANDLE DATA
+===================================================== */
+
+function handleData(data) {
+
+    if (!data) {
+        return;
+    }
+
+
+    /* =========================
+       CHAT
+    ========================== */
+
+    if (
+        data.type ===
+        "chat"
+    ) {
+
+        addMessage(
+            data.text,
+            "other"
+        );
+
+        return;
 
     }
 
-  }
 
-  /*
-    MATIKAN / NYALAKAN KAMERA
-  */
+    /* =========================
+       REMOTE MIC
+    ========================== */
 
-  function toggleCamera() {
+    if (
+        data.type ===
+        "mic"
+    ) {
 
-    if (!videoTrack) {
-      return;
-    }
+        showRemoteMic(
+            data.enabled
+        );
 
-    cameraOn = !cameraOn;
-
-    videoTrack.enabled = cameraOn;
-
-    document.getElementById("cameraButton").textContent =
-      cameraOn
-        ? "📹 Kamera"
-        : "🚫 Kamera";
-
-  }
-
-  /*
-    BALIK LAYAR
-  */
-
-  function toggleMirror() {
-
-    mirrored = !mirrored;
-
-    document.getElementById("localVideo").style.transform =
-      mirrored
-        ? "scaleX(-1)"
-        : "scaleX(1)";
-
-    document.getElementById("remoteVideo").style.transform =
-      mirrored
-        ? "scaleX(-1)"
-        : "scaleX(1)";
-
-  }
-
-  /*
-    AKHIRI PANGGILAN
-  */
-
-  function endCall() {
-
-    if (currentCall) {
-
-      currentCall.close();
-
-      currentCall = null;
+        return;
 
     }
 
-    if (localStream) {
 
-      localStream
-        .getTracks()
-        .forEach(function(track) {
+    /* =========================
+       REMOTE CAMERA
+    ========================== */
 
-          track.stop();
+    if (
+        data.type ===
+        "camera"
+    ) {
+
+        showRemoteCamera(
+            data.enabled
+        );
+
+        return;
+
+    }
+
+
+    /* =========================
+       REMOTE MIRROR
+    ========================== */
+
+    if (
+        data.type ===
+        "mirror"
+    ) {
+
+        remoteVideo.style.transform =
+            data.enabled
+                ? "scaleX(-1)"
+                : "scaleX(1)";
+
+        return;
+
+    }
+
+}
+
+
+/* =====================================================
+   MIC
+===================================================== */
+
+micBtn.onclick =
+    function() {
+
+        if (!audioTrack) {
+            return;
+        }
+
+
+        micOn =
+            !micOn;
+
+
+        audioTrack.enabled =
+            micOn;
+
+
+        micBtn.classList.toggle(
+            "active",
+            micOn
+        );
+
+        micBtn.classList.toggle(
+            "off",
+            !micOn
+        );
+
+
+        micBtn.innerHTML =
+            micOn
+                ? "🎙️<br>Mic"
+                : "🔇<br>Mic";
+
+
+        sendData({
+
+            type: "mic",
+
+            enabled: micOn
 
         });
 
-      localStream = null;
+    };
+
+
+/* =====================================================
+   CAMERA
+===================================================== */
+
+cameraBtn.onclick =
+    function() {
+
+        if (!videoTrack) {
+            return;
+        }
+
+
+        cameraOn =
+            !cameraOn;
+
+
+        videoTrack.enabled =
+            cameraOn;
+
+
+        cameraBtn.classList.toggle(
+            "active",
+            cameraOn
+        );
+
+        cameraBtn.classList.toggle(
+            "off",
+            !cameraOn
+        );
+
+
+        cameraBtn.innerHTML =
+            cameraOn
+                ? "📹<br>Kamera"
+                : "🚫<br>Kamera";
+
+
+        sendData({
+
+            type: "camera",
+
+            enabled: cameraOn
+
+        });
+
+    };
+
+
+/* =====================================================
+   MIRROR
+===================================================== */
+
+mirrorBtn.onclick =
+    function() {
+
+        mirrorOn =
+            !mirrorOn;
+
+
+        localVideo.style.transform =
+            mirrorOn
+                ? "scaleX(-1)"
+                : "scaleX(1)";
+
+
+        mirrorBtn.classList.toggle(
+            "active",
+            mirrorOn
+        );
+
+
+        sendData({
+
+            type: "mirror",
+
+            enabled: mirrorOn
+
+        });
+
+    };
+
+
+/* =====================================================
+   REMOTE MIC
+===================================================== */
+
+function showRemoteMic(enabled) {
+
+    if (enabled) {
+
+        remoteState.style.display =
+            "none";
+
+    }
+    else {
+
+        remoteState.style.display =
+            "block";
+
+        remoteState.innerText =
+            "🔇 Mikrofon dimatikan";
 
     }
 
-    audioTrack = null;
-    videoTrack = null;
-    audioSender = null;
+}
 
-    document.getElementById("localVideo").srcObject =
-      null;
 
-    document.getElementById("remoteVideo").srcObject =
-      null;
+/* =====================================================
+   REMOTE CAMERA
+===================================================== */
 
-    document.getElementById("callArea").style.display =
-      "none";
+function showRemoteCamera(enabled) {
 
-    document.getElementById("home").style.display =
-      "block";
+    if (enabled) {
 
-    document.getElementById("status").textContent =
-      "🟢 Online";
+        remoteState.style.display =
+            "none";
 
-    microphoneOn = true;
-    cameraOn = true;
-    mirrored = false;
+    }
+    else {
 
-    document.getElementById("micButton").textContent =
-      "🎙️ Mikrofon";
+        remoteState.style.display =
+            "block";
 
-    document.getElementById("micButton")
-      .classList.remove("mic-off");
+        remoteState.innerText =
+            "📷 Kamera dimatikan";
 
-    document.getElementById("cameraButton").textContent =
-      "📹 Kamera";
+    }
 
-    document.getElementById("localVideo").style.transform =
-      "scaleX(1)";
+}
 
-    document.getElementById("remoteVideo").style.transform =
-      "scaleX(1)";
 
-  }
+/* =====================================================
+   SEND DATA
+===================================================== */
 
-</script>
+function sendData(data) {
 
-</body>
-</html>
+    if (
+        dataConn &&
+        dataConn.open
+    ) {
+
+        dataConn.send(
+            data
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   CHAT
+===================================================== */
+
+function sendMessage() {
+
+    const text =
+        chatText.value.trim();
+
+
+    if (!text) {
+        return;
+    }
+
+
+    addMessage(
+        text,
+        "me"
+    );
+
+
+    sendData({
+
+        type: "chat",
+
+        text: text
+
+    });
+
+
+    chatText.value =
+        "";
+
+}
+
+
+sendBtn.onclick =
+    sendMessage;
+
+
+chatText.addEventListener(
+    "keydown",
+    function(event) {
+
+        if (
+            event.key 
