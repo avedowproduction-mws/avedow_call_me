@@ -36,7 +36,7 @@ header {
 }
 
 .logo {
-  font-size: 25px;
+  font-size: 24px;
   font-weight: bold;
 }
 
@@ -51,12 +51,13 @@ header {
 
 #welcome h1 {
   font-size: 40px;
-  margin: 10px 0;
+  line-height: 1.1;
 }
 
 #welcome p {
   color: #8b93a7;
   line-height: 1.6;
+  margin-top: 15px;
 }
 
 .start {
@@ -103,7 +104,7 @@ header {
 .controls {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 9px;
   margin-top: 15px;
 }
 
@@ -113,7 +114,7 @@ header {
   padding: 14px 5px;
   background: #182131;
   color: white;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
 }
 
@@ -135,7 +136,6 @@ header {
 #messages {
   height: 140px;
   overflow-y: auto;
-  margin-bottom: 10px;
 }
 
 .message {
@@ -155,6 +155,7 @@ header {
 .chatInput {
   display: flex;
   gap: 8px;
+  margin-top: 10px;
 }
 
 .chatInput input {
@@ -217,19 +218,22 @@ header {
 
   <div class="controls">
 
-    <button onclick="switchCamera()" id="cameraBtn">
-      🔄 Kamera
+    <button onclick="switchCamera()">
+      🔄 Ganti Kamera
     </button>
 
-    <button onclick="toggleMirror()" id="mirrorBtn">
+    <button onclick="toggleMirror()"
+            id="mirrorBtn">
       ↔️ Balik Layar
     </button>
 
-    <button onclick="toggleMic()" id="micBtn">
-      🎙️ Mic
+    <button onclick="toggleMic()"
+            id="micBtn">
+      🎙️ Mic ON
     </button>
 
-    <button onclick="toggleCamera()" id="videoBtn">
+    <button onclick="toggleCamera()"
+            id="videoBtn">
       📹 Kamera ON
     </button>
 
@@ -237,7 +241,8 @@ header {
       💬 Kirim
     </button>
 
-    <button onclick="endCall()" class="danger">
+    <button onclick="endCall()"
+            class="danger">
       🔴 Akhiri
     </button>
 
@@ -253,10 +258,11 @@ header {
         id="messageInput"
         type="text"
         placeholder="Ketik pesan..."
-        onkeydown="if(event.key==='Enter') sendMessage()"
-      >
+        onkeydown="if(event.key==='Enter') sendMessage()">
 
-      <button onclick="sendMessage()">Kirim</button>
+      <button onclick="sendMessage()">
+        Kirim
+      </button>
 
     </div>
 
@@ -277,7 +283,8 @@ let dataConnection = null;
 let localStream = null;
 let currentVideoTrack = null;
 
-let usingFrontCamera = true;
+let currentCameraId = null;
+
 let mirrored = false;
 let micEnabled = true;
 let cameraEnabled = true;
@@ -288,6 +295,7 @@ let cameraEnabled = true;
 ========================= */
 
 peer = new Peer({
+
   debug: 2,
 
   config: {
@@ -297,10 +305,11 @@ peer = new Peer({
       }
     ]
   }
+
 });
 
 
-peer.on("open", function(id) {
+peer.on("open", function() {
 
   document.getElementById("status").textContent =
     "🟢 Online";
@@ -310,12 +319,10 @@ peer.on("open", function(id) {
 
 peer.on("error", function(error) {
 
-  console.log("PeerJS error:", error);
+  console.log("PeerJS:", error);
 
   document.getElementById("status").textContent =
-    "🔴 Error";
-
-  alert("Koneksi gagal: " + error.type);
+    "🔴 Koneksi bermasalah";
 
 });
 
@@ -336,11 +343,25 @@ async function startCall() {
 
       });
 
+
     currentVideoTrack =
       localStream.getVideoTracks()[0];
 
+
+    if (currentVideoTrack) {
+
+      const settings =
+        currentVideoTrack.getSettings();
+
+      currentCameraId =
+        settings.deviceId || null;
+
+    }
+
+
     document.getElementById("localVideo").srcObject =
       localStream;
+
 
     currentCall =
       peer.call(
@@ -348,12 +369,15 @@ async function startCall() {
         localStream
       );
 
+
     if (!currentCall) {
 
-      alert("Gagal membuat panggilan.");
+      alert("Panggilan gagal dibuat.");
 
       return;
+
     }
+
 
     document.getElementById("welcome").style.display =
       "none";
@@ -365,8 +389,6 @@ async function startCall() {
       "📞 Memanggil...";
 
 
-    /* VIDEO OWNER */
-
     currentCall.on("stream", function(remoteStream) {
 
       document.getElementById("remoteVideo").srcObject =
@@ -377,8 +399,6 @@ async function startCall() {
 
     });
 
-
-    /* PANGGILAN DITUTUP */
 
     currentCall.on("close", function() {
 
@@ -398,26 +418,43 @@ async function startCall() {
     });
 
 
-    /* DATA CHAT */
+    /*
+      KONEKSI DATA UNTUK:
+      - chat
+      - sinkronisasi mirror
+      - status kamera
+      - status mikrofon
+    */
 
     dataConnection =
-      peer.connect(OWNER_ID);
+      peer.connect(
+        OWNER_ID,
+        {
+          reliable: true
+        }
+      );
+
 
     dataConnection.on("open", function() {
 
-      console.log("Chat connected");
+      console.log("Data connection terbuka");
+
+      sendControlState();
 
     });
 
+
     dataConnection.on("data", function(data) {
 
-      receiveMessage(data);
+      receiveData(data);
 
     });
 
   }
 
   catch(error) {
+
+    console.log(error);
 
     alert(
       "Kamera atau mikrofon tidak bisa digunakan.\n\n" +
@@ -430,35 +467,103 @@ async function startCall() {
 
 
 /* =========================
+   KIRIM STATUS KONTROL
+========================= */
+
+function sendControlState() {
+
+  if (
+    !dataConnection ||
+    !dataConnection.open
+  ) {
+    return;
+  }
+
+
+  dataConnection.send({
+
+    type: "control",
+
+    mirror: mirrored,
+
+    mic: micEnabled,
+
+    camera: cameraEnabled
+
+  });
+
+}
+
+
+/* =========================
    GANTI KAMERA
 ========================= */
 
 async function switchCamera() {
 
-  if (!currentCall) {
+  if (!currentCall || !localStream) {
 
     alert("Panggilan belum dimulai.");
 
     return;
+
   }
+
 
   try {
 
-    usingFrontCamera =
-      !usingFrontCamera;
+    const devices =
+      await navigator.mediaDevices.enumerateDevices();
 
-    const facing =
-      usingFrontCamera
-      ? "user"
-      : "environment";
+
+    const cameras =
+      devices.filter(function(device) {
+
+        return device.kind === "videoinput";
+
+      });
+
+
+    if (cameras.length < 2) {
+
+      alert(
+        "Perangkat ini tidak mendeteksi kamera kedua."
+      );
+
+      return;
+
+    }
+
+
+    let currentIndex =
+      cameras.findIndex(function(camera) {
+
+        return camera.deviceId === currentCameraId;
+
+      });
+
+
+    if (currentIndex < 0) {
+
+      currentIndex = 0;
+
+    }
+
+
+    const nextIndex =
+      (currentIndex + 1) % cameras.length;
+
+
+    const nextCamera =
+      cameras[nextIndex];
 
 
     const newStream =
       await navigator.mediaDevices.getUserMedia({
 
         video: {
-          facingMode: {
-            ideal: facing
+          deviceId: {
+            exact: nextCamera.deviceId
           }
         },
 
@@ -471,59 +576,95 @@ async function switchCamera() {
       newStream.getVideoTracks()[0];
 
 
+    if (!newTrack) {
+
+      throw new Error(
+        "Kamera baru tidak ditemukan."
+      );
+
+    }
+
+
     const sender =
       currentCall.peerConnection
       .getSenders()
-      .find(function(s) {
+      .find(function(sender) {
 
-        return s.track &&
-               s.track.kind === "video";
+        return sender.track &&
+               sender.track.kind === "video";
 
       });
 
 
-    if (sender) {
+    if (!sender) {
 
-      await sender.replaceTrack(newTrack);
+      throw new Error(
+        "Track video tidak ditemukan."
+      );
+
+    }
+
+
+    /*
+      GANTI TRACK VIDEO YANG SEDANG DIKIRIM
+    */
+
+    await sender.replaceTrack(
+      newTrack
+    );
+
+
+    const oldTrack =
+      localStream.getVideoTracks()[0];
+
+
+    if (oldTrack) {
+
+      oldTrack.stop();
+
+      localStream.removeTrack(
+        oldTrack
+      );
 
     }
 
 
-    if (currentVideoTrack) {
-
-      currentVideoTrack.stop();
-
-    }
+    localStream.addTrack(
+      newTrack
+    );
 
 
     currentVideoTrack =
       newTrack;
 
-
-    localStream.removeTrack(
-      localStream.getVideoTracks()[0]
-    );
-
-    localStream.addTrack(newTrack);
+    currentCameraId =
+      nextCamera.deviceId;
 
 
     document.getElementById("localVideo").srcObject =
       localStream;
 
 
+    /*
+      Pastikan status kamera tetap sesuai
+    */
+
+    newTrack.enabled =
+      cameraEnabled;
+
+
     document.getElementById("status").textContent =
-      usingFrontCamera
-      ? "📱 Kamera depan"
-      : "📷 Kamera belakang";
+      "🔄 Kamera berhasil diganti";
+
 
   }
 
   catch(error) {
 
-    console.log(error);
-
-    usingFrontCamera =
-      !usingFrontCamera;
+    console.error(
+      "Gagal mengganti kamera:",
+      error
+    );
 
     alert(
       "Kamera tidak bisa diganti.\n\n" +
@@ -544,30 +685,66 @@ function toggleMirror() {
   mirrored =
     !mirrored;
 
+
+  /*
+    Balik preview sendiri
+  */
+
   document.getElementById("localVideo").style.transform =
     mirrored
     ? "scaleX(-1)"
     : "scaleX(1)";
 
+
+  /*
+    KIRIM PERINTAH KE OWNER
+    agar video penelepon di Owner
+    juga ikut dibalik.
+  */
+
+  if (
+    dataConnection &&
+    dataConnection.open
+  ) {
+
+    dataConnection.send({
+
+      type: "mirror",
+
+      value: mirrored
+
+    });
+
+  }
+
+
+  document.getElementById("mirrorBtn").textContent =
+    mirrored
+    ? "↔️ Layar Normal"
+    : "↔️ Balik Layar";
+
 }
 
 
 /* =========================
-   MUTE MICROPHONE
+   MICROPHONE
 ========================= */
 
 function toggleMic() {
 
   if (!localStream) return;
 
+
   const audioTracks =
     localStream.getAudioTracks();
+
 
   if (audioTracks.length === 0) {
 
     alert("Mikrofon tidak ditemukan.");
 
     return;
+
   }
 
 
@@ -583,21 +760,70 @@ function toggleMic() {
   });
 
 
+  /*
+    Pastikan sender audio juga
+    menggunakan status terbaru.
+  */
+
+  if (currentCall) {
+
+    const audioSender =
+      currentCall.peerConnection
+      .getSenders()
+      .find(function(sender) {
+
+        return sender.track &&
+               sender.track.kind === "audio";
+
+      });
+
+
+    if (audioSender && audioSender.track) {
+
+      audioSender.track.enabled =
+        micEnabled;
+
+    }
+
+  }
+
+
   document.getElementById("micBtn").textContent =
     micEnabled
     ? "🎙️ Mic ON"
     : "🔇 Mic OFF";
 
+
+  /*
+    Beri tahu Owner
+  */
+
+  if (
+    dataConnection &&
+    dataConnection.open
+  ) {
+
+    dataConnection.send({
+
+      type: "mic",
+
+      value: micEnabled
+
+    });
+
+  }
+
 }
 
 
 /* =========================
-   MATIKAN KAMERA
+   KAMERA ON / OFF
 ========================= */
 
 function toggleCamera() {
 
   if (!localStream) return;
+
 
   const videoTracks =
     localStream.getVideoTracks();
@@ -608,6 +834,7 @@ function toggleCamera() {
     alert("Kamera tidak ditemukan.");
 
     return;
+
   }
 
 
@@ -623,10 +850,53 @@ function toggleCamera() {
   });
 
 
+  if (currentCall) {
+
+    const videoSender =
+      currentCall.peerConnection
+      .getSenders()
+      .find(function(sender) {
+
+        return sender.track &&
+               sender.track.kind === "video";
+
+      });
+
+
+    if (videoSender && videoSender.track) {
+
+      videoSender.track.enabled =
+        cameraEnabled;
+
+    }
+
+  }
+
+
   document.getElementById("videoBtn").textContent =
     cameraEnabled
     ? "📹 Kamera ON"
     : "🚫 Kamera OFF";
+
+
+  /*
+    Beri tahu Owner
+  */
+
+  if (
+    dataConnection &&
+    dataConnection.open
+  ) {
+
+    dataConnection.send({
+
+      type: "camera",
+
+      value: cameraEnabled
+
+    });
+
+  }
 
 }
 
@@ -639,6 +909,7 @@ function sendMessage() {
 
   const input =
     document.getElementById("messageInput");
+
 
   const text =
     input.value.trim();
@@ -653,15 +924,20 @@ function sendMessage() {
   ) {
 
     dataConnection.send({
+
       type: "message",
+
       text: text
+
     });
+
 
     addMessage(
       "Saya",
       text,
       true
     );
+
 
     input.value = "";
 
@@ -676,12 +952,16 @@ function sendMessage() {
 }
 
 
-function receiveMessage(data) {
+/* =========================
+   DATA MASUK
+========================= */
 
-  if (
-    data &&
-    data.type === "message"
-  ) {
+function receiveData(data) {
+
+  if (!data) return;
+
+
+  if (data.type === "message") {
 
     addMessage(
       "Owner",
@@ -694,13 +974,19 @@ function receiveMessage(data) {
 }
 
 
-function addMessage(name, text, me) {
+function addMessage(
+  name,
+  text,
+  me
+) {
 
   const box =
     document.getElementById("messages");
 
+
   const div =
     document.createElement("div");
+
 
   div.className =
     "message" +
@@ -723,7 +1009,9 @@ function addMessage(name, text, me) {
    AKHIRI PANGGILAN
 ========================= */
 
-function endCall(closePeerCall = true) {
+function endCall(
+  closePeerCall = true
+) {
 
   if (
     closePeerCall &&
@@ -755,20 +1043,21 @@ function endCall(closePeerCall = true) {
   if (localStream) {
 
     localStream
-      .getTracks()
-      .forEach(function(track) {
+    .getTracks()
+    .forEach(function(track) {
 
-        track.stop();
+      track.stop();
 
-      });
+    });
 
     localStream = null;
 
   }
 
 
-  currentVideoTrack = null;
   currentCall = null;
+  currentVideoTrack = null;
+  currentCameraId = null;
 
 
   document.getElementById("localVideo").srcObject =
@@ -789,10 +1078,9 @@ function endCall(closePeerCall = true) {
     "🟢 Online";
 
 
+  mirrored = false;
   micEnabled = true;
   cameraEnabled = true;
-  mirrored = false;
-  usingFrontCamera = true;
 
 
   document.getElementById("localVideo").style.transform =
@@ -800,10 +1088,13 @@ function endCall(closePeerCall = true) {
 
 
   document.getElementById("micBtn").textContent =
-    "🎙️ Mic";
+    "🎙️ Mic ON";
 
   document.getElementById("videoBtn").textContent =
     "📹 Kamera ON";
+
+  document.getElementById("mirrorBtn").textContent =
+    "↔️ Balik Layar";
 
 
   document.getElementById("messages").innerHTML =
